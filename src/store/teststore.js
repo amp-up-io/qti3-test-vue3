@@ -317,6 +317,18 @@ export const teststore = {
     return this.initializePartSectionItemStateMap(partSectionIdentifier)
   },
 
+  /**
+   * @description Retrieve all possible variable values, filtered by Section Identifier,
+   * Include Category, and Exclude Category.
+   * 
+   * TODO: Implement Include/Exclude Category.
+   * 
+   * @param {*} sectionIdentifier 
+   * @param {*} includeCategory 
+   * @param {*} excludeCategory 
+   * @param {*} variableIdentifier 
+   * @returns 
+   */
   getAllVariableStatesByFilter(
       sectionIdentifier,
       includeCategory,
