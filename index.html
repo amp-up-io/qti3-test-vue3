@@ -1,0 +1,62 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <link rel="icon" href="/favicon.svg">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>QTI 3 Test Player</title>
+    <link href="/assets/css/bootstrap.css" rel="stylesheet" type="text/css" />
+    <script src="/assets/js/bootstrap.bundle.min.js"></script>
+    <script>
+    window.qti3TestPlayerContext = {
+      "summary": {
+        "identifier":"t1-outcome-declaration-t9-outcome-processing",
+        "size":"1652",
+        "created":"2023-05-08T17:28:03.829305Z",
+        "xml":`<qti-assessment-test xmlns=\"http://www.imsglobal.org/xsd/imsqtiasi_v3p0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" 
+        identifier=\"t1-outcome-declaration-t9-outcome-processing\" 
+        title=\"T1 - Outcome Declaration and T9 Outcomes Processing for Tests\" 
+        xsi:schemaLocation=\"http://www.imsglobal.org/xsd/imsqtiasi_v3p0 https://purl.imsglobal.org/spec/qti/v3p0/schema/xsd/imsqti_asiv3p0_v1p0.xsd\">\n    
+        <qti-outcome-declaration base-type=\"float\" cardinality=\"single\" identifier=\"SCORE_TOTAL\">
+          <qti-default-value>\n            <qti-value>0</qti-value>\n        </qti-default-value>\n    
+        </qti-outcome-declaration>\n    
+        
+        <qti-test-part identifier=\"testPart-1\" navigation-mode=\"linear\" submission-mode=\"individual\">\n
+          <qti-assessment-section identifier=\"assessmentSection-1\" keep-together=\"true\" title=\"Section 1\" visible=\"true\">\n            
+            <qti-assessment-item-ref href=\"items/item-1.xml\" identifier=\"t1-outcome-declaration-item-1\"></qti-assessment-item-ref>\n            
+            <qti-assessment-item-ref href=\"items/item-2.xml\" identifier=\"t1-outcome-declaration-item-2\"></qti-assessment-item-ref>\n            
+            <qti-assessment-item-ref href=\"items/item-3.xml\" identifier=\"t1-outcome-declaration-item-3\"></qti-assessment-item-ref>\n        
+          </qti-assessment-section>\n   
+        </qti-test-part>\n    
+        <qti-outcome-processing>\n        
+          <qti-set-outcome-value identifier=\"SCORE_TOTAL\">\n            
+            <qti-sum>\n                
+              <qti-test-variables section-identifier=\"assessmentSection-1\" include-category=\"foo\" variable-identifier=\"SCORE\"></qti-test-variables>\n                
+              <qti-variable identifier=\"SCORE_TOTAL\"></qti-variable>\n            
+            </qti-sum>\n        
+          </qti-set-outcome-value>
+        </qti-outcome-processing>
+        
+      </qti-assessment-test>`,
+        "id":"802",
+        "projectId":"186",
+        "projectGuid":"43894675-a8cb-4846-b594-29fcd130bc7f",
+        "title":"T1 - Outcome Declaration and T9 Outcomes Processing for Tests",
+        "baseUrl":"https://bank.stage.amp-up.io",
+        "apiPrefix":"/api/projects/v1",
+        "token":"eyJhbGciOiJIUzUxMiJ9.eyJzdWIiOiIxLGFkbWluQGFtcC11cC5pbyIsImlzcyI6ImFtcC11cC5pbyIsInJvbGVzIjoiW1JPTEVfQURNSU5dIiwiaWF0IjoxNzIyNjA5MjE1LCJleHAiOjE3MjI2OTU2MTV9.rPoR-hNEiH0FZyIufNpj2u8_rhfUcXMdUKlmWlX5yJFQbMJS5nI3pxpXsndFo9cAK9jQUHzKuFNh0qR8379a-w",
+        "sessionGuid": "01234567-abcd-0123-abcd-0123456789ab",
+      },
+      "cfg": {
+        "pnp": null,
+        "sessionControl": null,
+        "pciContext": {"renderer2p0": "./assets/pci/pci.html"}
+      }
+    }
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
