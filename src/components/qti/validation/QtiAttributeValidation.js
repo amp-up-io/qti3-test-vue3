@@ -713,6 +713,17 @@ export default class QtiAttributeValidation {
     }
   }
 
+  BooleanValueOf (value) {
+    if (typeof value === 'undefined') return null
+    if (value === null) return null
+
+    value = value.trim()
+
+    if (value.toLowerCase() === 'true' || value === '1') return true
+    if (value.toLowerCase() === 'false' || value === '0') return false
+    throw new QtiParseException('Invalid boolean "' + value + '".')
+  }
+
   /**
    * @description Pseudo-random string generator
    * http://stackoverflow.com/a/27872144/383904

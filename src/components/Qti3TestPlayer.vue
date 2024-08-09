@@ -335,7 +335,7 @@ Vue.component('qti-outcome-processing', QtiOutcomeProcessing)
         .component('qti-exit-test', QtiExitTest)
         .component('qti-lookup-outcome-value', QtiLookupOutcomeValue)
         .component('qti-outcome-if', QtiOutcomeIf)
-        .component('qti-outcomee-else', QtiOutcomeElse)
+        .component('qti-outcome-else', QtiOutcomeElse)
         .component('qti-outcome-else-if', QtiOutcomeElseIf)
         .component('qti-set-default-value', QtiSetDefaultValue)
 

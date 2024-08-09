@@ -44,41 +44,54 @@ export default {
      */
     validateChildren () {
       let countExpression = 0
-      this.$slots.default.forEach((slot) => {
+
+      if (!this.$slots.default) {
+        throw new QtiValidationException('Must have exactly one Expression node')
+      }
+
+      this.$slots.default().forEach((slot) => {
         if (qtiAttributeValidation.isValidSlot(slot)) {
+          const tag = qtiAttributeValidation.kebabCase(slot.type.name)
           // Detect an expression
-          if (qtiProcessing.isExpressionNode(slot.componentOptions.tag)) {
+          if (qtiProcessing.isExpressionNode(tag)) {
             if (countExpression === 0) {
                 countExpression = 1
             } else {
-              throw new QtiValidationException('Multiple Expression nodes: "' + slot.componentOptions.tag + '"')
+              throw new QtiValidationException('Multiple Expression nodes: "' + slot.type.name + '"')
             }
           }
           // Detect * Outcome Rules after the Expression
-          else if (qtiProcessing.isOutcomeRuleNode(slot.componentOptions.tag)) {
+          else if (qtiProcessing.isOutcomeRuleNode(tag)) {
             if (countExpression === 0) {
-              throw new QtiValidationException('Outcome Rules must follow an Expression node: "' + slot.componentOptions.tag + '"')
+              throw new QtiValidationException('Outcome Rules must follow an Expression node: "' + slot.type.name + '"')
             }
           } else {
-            throw new QtiValidationException('Node is not an Expression or an Outcome Rule: "' + slot.componentOptions.tag + '"')
+            throw new QtiValidationException('Node is not an Expression or an Outcome Rule: "' + slot.type.name + '"')
           }
         }
       })
       if (countExpression === 0) {
         throw new QtiValidationException('Must have exactly one Expression node')
       }
-      // All good.  Save off our children.
-      this.processChildren()
     },
 
+    /**
+     * Iterate through the child nodes:
+     * expression (1)
+     * outcomeRule (*)
+     */
     processChildren () {
+      const children = this.$.subTree.children[0].children
+
       let firstRule = true
-      this.$children.forEach((rule) => {
+      children.forEach((rule) => {
+        if (rule.component === null) return
+        const node = rule.component.proxy
         if (firstRule) {
           firstRule = false
-          this.expression = rule
+          this.expression = node
         } else {
-          this.outcomeRules.push(rule)
+          this.outcomeRules.push(node)
         }
       })
     },
@@ -106,10 +119,23 @@ export default {
     }
   },
 
+  created () {
+    try {
+      this.validateChildren()
+    } catch (err) {
+      this.isQtiValid = false
+      if (err.name === 'QtiValidationException') {
+        throw new QtiValidationException(err.message)
+      } else {
+        throw new Error(err.message)
+      }
+    }
+  },
+
   mounted () {
     if (this.isQtiValid) {
       try {
-        this.validateChildren()
+        this.processChildren()
       } catch (err) {
         this.isQtiValid = false
         throw new QtiValidationException(err.message)

@@ -40,25 +40,33 @@ export default {
      * outcomeRule (*)
      */
     validateChildren () {
-      this.$slots.default.forEach((slot) => {
+      if (!this.$slots.default) return
+
+      this.$slots.default().forEach((slot) => {
         if (qtiAttributeValidation.isValidSlot(slot)) {
+          const tag = qtiAttributeValidation.kebabCase(slot.type.name)
           // Detect an expression
-          if (qtiProcessing.isExpressionNode(slot.componentOptions.tag)) {
-            throw new QtiValidationException('Expression nodes not permitted: "' + slot.componentOptions.tag + '"')
+          if (qtiProcessing.isExpressionNode(tag)) {
+            throw new QtiValidationException('Expression nodes not permitted: "' + slot.type.name + '"')
           }
           // Detect * Outcome Rules
-          if (!qtiProcessing.isOutcomeRuleNode(slot.componentOptions.tag)) {
-            throw new QtiValidationException('Invalid Outcome Rule node: "' + slot.componentOptions.tag + '"')
+          if (!qtiProcessing.isOutcomeRuleNode(tag)) {
+            throw new QtiValidationException('Invalid Outcome Rule node: "' + slot.type.name + '"')
           }
         }
       })
-      // All good.  Save off our children.
-      this.processChildren()
     },
 
-    processChildren () {
-      this.$children.forEach((rule) => {
-        this.outcomeRules.push(rule)
+    /**
+     * Iterate through the child nodes:
+     * outcomeRule (*)
+     */
+     processChildren () {
+      const children = this.$.subTree.children[0].children
+
+      children.forEach((rule) => {
+        if (rule.component === null) return
+        this.outcomeRules.push(rule.component.proxy)
       })
     },
 
@@ -82,10 +90,23 @@ export default {
     }
   },
 
+  created () {
+    try {
+      this.validateChildren()
+    } catch (err) {
+      this.isQtiValid = false
+      if (err.name === 'QtiValidationException') {
+        throw new QtiValidationException(err.message)
+      } else {
+        throw new Error(err.message)
+      }
+    }
+  },
+
   mounted () {
     if (this.isQtiValid) {
       try {
-        this.validateChildren()
+        this.processChildren()
       } catch (err) {
         this.isQtiValid = false
         throw new QtiValidationException(err.message)
