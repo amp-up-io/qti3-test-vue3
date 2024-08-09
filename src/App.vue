@@ -278,6 +278,12 @@ export default {
             "value": 1
           },
           {
+            "identifier": "MAXSCORE",
+            "cardinality": "single",
+            "baseType": "float",
+            "value": 1
+          },
+          {
             "identifier": "completionStatus",
             "cardinality": "single",
             "value": "not_attempted"
@@ -332,6 +338,12 @@ export default {
         "outcomeVariables": [
           {
             "identifier": "SCORE",
+            "cardinality": "single",
+            "baseType": "float",
+            "value": 1
+          },
+          {
+            "identifier": "MAXSCORE",
             "cardinality": "single",
             "baseType": "float",
             "value": 1
