@@ -99,6 +99,8 @@ export default {
       valueCardinality: 'multiple',
       includeCategoryValue: null,
       excludeCategoryValue: null,
+      variableItemIdentifierValue: null,
+      variableIdentifierValue: null,
       isQtiValid: true
     }
   },
@@ -147,6 +149,24 @@ export default {
       return category
     },
 
+    processVariableIdentifierAttribute () {
+      if (this.variableIdentifier.length === 0) {
+        throw new QtiValidationException('"variable-identifier" attribute must be a valid identifier value')
+      }
+
+      const parts = this.variableIdentifier.split('.')
+      if (parts.length === 1) {
+        return this.variableIdentifierValue = parts[0]
+      }
+
+      if (parts.length === 2) {
+        this.variableItemIdentifierValue = parts[0]
+        return this.variableIdentifierValue = parts[1]
+      }
+
+      throw new QtiValidationException('"variable-identifier" attribute contains an illegal identifier value')
+    },
+
     /**
      * Iterate through the child nodes:
      * There should be zero child nodes of this component.
@@ -159,16 +179,19 @@ export default {
      * @description Retrieve all possible variable values, filtered by Section Identifier,
      * Include Category, and Exclude Category.
      * 
-     * @param {*} includeCategory 
-     * @param {*} excludeCategory 
-     * @param {*} variableIdentifier 
+     * @param {String} sectionIdentifier 
+     * @param {String} includeCategory 
+     * @param {String} excludeCategory 
+     * @param {String} itemIdentifier 
+     * @param {String} itemVariableIdentifier 
      * @return {Array} - array of variable values for all sections or for a specific section
      */
     getAllSectionVariableValuesByFilter(
         sectionIdentifier,
         includeCategory, 
-        excludeCategory, 
-        variableIdentifier) {
+        excludeCategory,
+        itemIdentifier, 
+        itemVariableIdentifier) {
 
       // A null sectionIdentifier indicates we want all sections
       if (sectionIdentifier === null) {
@@ -183,7 +206,8 @@ export default {
                           section.getIdentifier(),
                           includeCategory,
                           excludeCategory,
-                          variableIdentifier)
+                          itemIdentifier,
+                          itemVariableIdentifier)
 
             // Add values to the result
             values.forEach((value) => result.push(value))
@@ -198,24 +222,27 @@ export default {
                     sectionIdentifier,
                     includeCategory,
                     excludeCategory,
-                    variableIdentifier)
+                    itemIdentifier,
+                    itemVariableIdentifier)
     },
 
     /**
      * @description Retrieve all possible variable values, filtered by Section Identifier,
      * Include Category, and Exclude Category.
      * 
-     * @param {*} sectionIdentifier 
-     * @param {*} includeCategory 
-     * @param {*} excludeCategory 
-     * @param {*} variableIdentifier 
+     * @param {String} sectionIdentifier 
+     * @param {String} includeCategory 
+     * @param {String} excludeCategory 
+     * @param {String} itemIdentifier 
+     * @param {String} itemVariableIdentifier 
      * @return {Array} array of variable values for the given sectionIdentifier
      */
     getSectionVariableValuesByFilter(
         sectionIdentifier,
         includeCategory,
         excludeCategory,
-        variableIdentifier) {
+        itemIdentifier,
+        itemVariableIdentifier) {
 
       const result = []
 
@@ -233,21 +260,22 @@ export default {
                     sectionItemState,
                     includeCategory,
                     excludeCategory,
-                    variableIdentifier)
+                    itemIdentifier,
+                    itemVariableIdentifier)
     },
 
     /**
      * @description Loop through all TestPart's, searching for a Section
      * with the provided identifier.
-     * @param {*} identifier - identifier of the section
+     * @param {*} sectionIdentifier - identifier of the section
      * @returns {Node} - a section node or null
      */
-    findSectionByIdentifier (identifier) {
+    findSectionByIdentifier (sectionIdentifier) {
       let foundSection = null
 
       teststore.getTestParts().forEach((testPart) => {
         testPart.getSections().forEach((section) => {
-          if (section.getIdentifier() === identifier) {
+          if (section.getIdentifier() === sectionIdentifier) {
             foundSection = section
           }
         })
@@ -304,15 +332,17 @@ export default {
      * @param {Map} sectionItemState 
      * @param {String} includeCategory 
      * @param {String} excludeCategory 
-     * @param {String} variableIdentifier 
+     * @param {String} itemIdentifier
+     * @param {String} itemVariableIdentifier 
      * @return {Array} - array of variable values
      */
     findSectionItemVariableValues (
         section,
         sectionItemState, 
         includeCategory, 
-        excludeCategory, 
-        variableIdentifier) {
+        excludeCategory,
+        itemIdentifier,
+        itemVariableIdentifier) {
       let values = []
 
       if (section === null) return values
@@ -345,18 +375,22 @@ export default {
       }
 
       sectionItems.forEach((item) => {
-        const itemIdentifier = item.getIdentifier()
-        const itemState = sectionItemState.get(itemIdentifier)
+        
+        // Looking for a specific item when the itemIdentifier param is not null. 
+        // If the item's identifier doesn't match the itemIdentifier param, bail.
+        if ((itemIdentifier !== null) && (itemIdentifier !== item.getIdentifier())) return
+
+        const itemState = sectionItemState.get(item.getIdentifier())
         
         // No state.  Bail.
         if (typeof itemState === 'undefined') return
 
         // Found a state.  Look for the variable with the given identifier
-        const variable = teststore.findItemVariableValueByIdentifier(itemState, variableIdentifier)
+        const variable = teststore.findItemVariableValueByIdentifier(itemState, itemVariableIdentifier)
 
         if (variable !== null)
           values.push({
-            itemIdentifier: itemIdentifier,
+            itemIdentifier: item.getIdentifier(),
             value: variable.value,
             baseType: variable.baseType,
             cardinality: variable.cardinality
@@ -383,9 +417,8 @@ export default {
             this.sectionIdentifier, 
             this.includeCategoryValue,
             this.excludeCategoryValue,
-            this.variableIdentifier)
-
-        console.log('VARIABLE RESULTS:', variableResults)
+            this.variableItemIdentifierValue,
+            this.variableIdentifierValue)
 
         if (variableResults != null) {
           variableResults.forEach((result) => {
@@ -450,6 +483,11 @@ export default {
       this.includeCategoryValue = this.processIncludeCategoryAttribute()
       // Prepare exclude-category attribute
       this.excludeCategoryValue = this.processExcludeCategoryAttribute()
+      // Prepare variable-identifier attribute
+      this.processVariableIdentifierAttribute()
+      console.log('variable identifier value:', this.variableIdentifierValue)
+      // @TODO: handle weight-identifier
+
     } catch (err) {
       this.isQtiValid = false
       if (err.name === 'QtiValidationException') {
