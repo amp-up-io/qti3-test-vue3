@@ -24,25 +24,6 @@ import QtiParseException from '@/components/qti/exceptions/QtiParseException'
 import QtiAttributeValidation from '@/components/qti/validation/QtiAttributeValidation'
 import EventListener from '@/shared/components/EventListener.vue'
 
-/*
-import QtiContextDeclaration from '@/components/qti/declarations/QtiContextDeclaration'
-import QtiOutcomeDeclaration from '@/components/qti/declarations/QtiOutcomeDeclaration'
-import QtiTimeLimits from '@/components/qti/control/QtiTimeLimits'
-import QtiStylesheet from '@/components/qti/general/QtiStylesheet'
-import QtiRubricBlock from '@/components/qti/general/QtiRubricBlock'
-import QtiTestPart from '@/components/qti/general/QtiTestPart'
-import QtiOutcomeProcessing from '@/components/qti/processing/QtiOutcomeProcessing'
-
-Vue.component('event-listener', EventListener)
-Vue.component('qti-context-declaration', QtiContextDeclaration)
-Vue.component('qti-outcome-declaration', QtiOutcomeDeclaration)
-Vue.component('qti-time-limits', QtiTimeLimits)
-Vue.component('qti-stylesheet', QtiStylesheet)
-Vue.component('qti-rubric-block', QtiRubricBlock)
-Vue.component('qti-test-part', QtiTestPart)
-Vue.component('qti-outcome-processing', QtiOutcomeProcessing)
-*/
-
 const qtiAttributeValidation = new QtiAttributeValidation()
 
 export default {
@@ -304,14 +285,16 @@ export default {
     },
 
     /**
-     * @description This executes immediately upon completion
+     * @description This executes upon completion
      * of a qti-test-part $mount
      * @param node - an object containing a testPart node
+     *               and the testPart's identifier
      */
     handleTestPartReady (node) {
       // Save the testPart in the teststore
       teststore.defineTestPart({
-          node: node.testPart
+          testPart: node.testPart,
+          identifier: node.identifier
         })
     },
 
