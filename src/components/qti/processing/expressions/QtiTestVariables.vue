@@ -177,7 +177,9 @@ export default {
 
     /**
      * @description Retrieve all possible variable values, filtered by Section Identifier,
-     * Include Category, and Exclude Category.
+     * Include Category, Exclude Category, Item Identifier, Item Variable Identifier,
+     * and baseType.
+     * 
      * 
      * @param {String} sectionIdentifier 
      * @param {String} includeCategory 
@@ -328,7 +330,7 @@ export default {
      * @description Retrieve all item variable values from a section item state, filtered
      * by section, includeCategory, excludeCategory, and variableIdentifier.
      * 
-     * @param {Node} section 
+     * @param {Node} section - section node
      * @param {Map} sectionItemState 
      * @param {String} includeCategory 
      * @param {String} excludeCategory 
@@ -389,12 +391,19 @@ export default {
         const variable = teststore.findItemVariableValueByIdentifier(itemState, itemVariableIdentifier)
 
         if (variable !== null)
-          values.push({
-            itemIdentifier: item.getIdentifier(),
-            value: variable.value,
-            baseType: variable.baseType,
-            cardinality: variable.cardinality
-          })
+
+          // Last part of the filter is baseType.  
+          // If baseType is null, add a value.
+          // If baseType is not null, the variable's baseType must match.
+          if ((this.baseType === null) || 
+              (this.baseType === variable.baseType)) {
+            values.push({
+              itemIdentifier: item.getIdentifier(),
+              value: variable.value,
+              baseType: variable.baseType,
+              cardinality: variable.cardinality
+            })
+          }
 
       })
 
@@ -410,8 +419,9 @@ export default {
             ? true 
             : false
 
-        // Retrieve all possible variable values, sectionIdentifier,
-        // Include Category, and Exclude Category.
+        // Retrieve all possible variable values by Section Identifier,
+        // Include Category, Exclude Category, Item Identifier, and 
+        // Item Variable Identifier.
         let variableResults = 
           this.getAllSectionVariableValuesByFilter(
             this.sectionIdentifier, 
