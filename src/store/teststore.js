@@ -127,17 +127,17 @@ export const teststore = {
     this.state.timeLimit = timeLimitNode.node;
   },
 
-  defineTestPart (testPart) {
-    let partIndex = this.state.testParts.findIndex(p => p.identifier == testPart.identifier)
+  defineTestPart (node) {
+    let partIndex = this.state.testParts.findIndex(p => p.identifier == node.identifier)
 
     if (partIndex < 0) {
         // New part
-        this.state.testParts.push(testPart)
+        this.state.testParts.push(node.testPart)
         return
     }
 
     // Found the part. Replace the old with the new
-    this.state.testParts[partIndex] = testPart
+    this.state.testParts[partIndex] = node.testPart
   },
 
   defineProcessing (processingObject) {
@@ -317,54 +317,6 @@ export const teststore = {
     return this.initializePartSectionItemStateMap(partSectionIdentifier)
   },
 
-  /**
-   * @description Retrieve all possible variable values, filtered by Section Identifier,
-   * Include Category, and Exclude Category.
-   * 
-   * TODO: Implement Include/Exclude Category.
-   * 
-   * @param {*} sectionIdentifier 
-   * @param {*} includeCategory 
-   * @param {*} excludeCategory 
-   * @param {*} variableIdentifier 
-   * @returns 
-   */
-  getAllVariableStatesByFilter(
-      sectionIdentifier,
-      includeCategory,
-      excludeCategory,
-      variableIdentifier) {
-
-    let result = []
-
-    if (sectionIdentifier != null) {
-      const sectionItemState = this.getPartSectionMapBySectionIdentifier(sectionIdentifier)
-      if (sectionItemState === null) return result
-
-      result =
-        this.findSectionItemVariableValues(
-          sectionItemState,
-          includeCategory,
-          excludeCategory,
-          variableIdentifier)
-
-      return result
-    }
-    
-    for (let sectionItemState of this.sectionItemStates.values()) {
-      let values = 
-        this.findSectionItemVariableValues(
-          sectionItemState, 
-          includeCategory, 
-          excludeCategory, 
-          variableIdentifier)
-      
-      values.forEach((value) => result.push(value))
-    }
-
-    return result
-  },
-
   getPartSectionMapBySectionIdentifier (sectionIdentifier) {
     for (let [k,v] of this.sectionItemStates) {
       if (k.endsWith(sectionIdentifier)) return v
@@ -375,26 +327,6 @@ export const teststore = {
   initializePartSectionItemStateMap (partSectionIdentifier) {
     this.sectionItemStates.set(partSectionIdentifier, new Map())
     return this.sectionItemStates.get(partSectionIdentifier)
-  },
-
-  findSectionItemVariableValues (sectionItemState, includeCategory, excludeCategory, identifier) {
-    let values = []
-
-    for (let [itemIdentifier,itemState] of sectionItemState) {
-      const variable = this.findItemVariableValueByIdentifier(itemState, identifier)
-
-      if (variable !== null)
-        values.push({
-          itemIdentifier: itemIdentifier,
-          value: variable.value,
-          baseType: variable.baseType,
-          cardinality: variable.cardinality,
-          includeCategory: includeCategory,
-          excludeCategory: excludeCategory
-        })
-    }
-    
-    return values
   },
 
   findItemVariableValueByIdentifier (itemState, identifier) {

@@ -68,6 +68,7 @@ export default {
       // attributes converted to booleans
       isRequired: false,
       isFixed: false,
+      categoryValue: null,
 
       // child elements
       preConditions: [],
@@ -100,7 +101,7 @@ export default {
     },
 
     getCategory () {
-      return this.category
+      return this.categoryValue
     },
 
     getPreConditions () {
@@ -172,6 +173,13 @@ export default {
 
     getIsFixed () {
       return this.isFixed
+    },
+
+    processCategoryAttribute () {
+      if (this.category === null) return null
+      const category = this.category.trim()
+      if (category.length === 0) return null
+      return category
     },
 
     /**
@@ -307,13 +315,15 @@ export default {
     }
     
   },
-  
+
   created () {
     try {
       qtiAttributeValidation.validateIdentifierAttribute(this.identifier)
       // Validate required, fixed
       this.isRequired = qtiAttributeValidation.validateBooleanAttribute ('required', this.required, false, false)
       this.isFixed = qtiAttributeValidation.validateBooleanAttribute ('fixed', this.fixed, false, false)
+      // Prepare category attribute
+      this.categoryValue = this.processCategoryAttribute()
     } catch (err) {
       this.isQtiValid = false
       if (err.name === 'QtiValidationException') {
@@ -325,7 +335,7 @@ export default {
       }
     }
   },
-  
+
   mounted () {
     if (this.isQtiValid) {
       try {

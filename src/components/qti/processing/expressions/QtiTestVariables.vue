@@ -97,6 +97,8 @@ export default {
       value: null,
       valueBaseType: null,
       valueCardinality: 'multiple',
+      includeCategoryValue: null,
+      excludeCategoryValue: null,
       isQtiValid: true
     }
   },
@@ -129,6 +131,20 @@ export default {
 
     setCardinality (cardinality) {
       this.valueCardinality = cardinality
+    },   
+
+    processIncludeCategoryAttribute () {
+      if (this.includeCategory === null) return null
+      const category = this.includeCategory.trim()
+      if (category.length === 0) return null
+      return category
+    },
+
+    processExcludeCategoryAttribute () {
+      if (this.excludeCategory === null) return null
+      const category = this.excludeCategory.trim()
+      if (category.length === 0) return null
+      return category
     },
 
     /**
@@ -137,6 +153,218 @@ export default {
      */
     validateChildren () {
       // TODO: ??
+    },
+
+    /**
+     * @description Retrieve all possible variable values, filtered by Section Identifier,
+     * Include Category, and Exclude Category.
+     * 
+     * @param {*} includeCategory 
+     * @param {*} excludeCategory 
+     * @param {*} variableIdentifier 
+     * @return {Array} - array of variable values for all sections or for a specific section
+     */
+    getAllSectionVariableValuesByFilter(
+        sectionIdentifier,
+        includeCategory, 
+        excludeCategory, 
+        variableIdentifier) {
+
+      // A null sectionIdentifier indicates we want all sections
+      if (sectionIdentifier === null) {
+        const result = []
+
+        // Loop through all parts and their immediate nested sections
+        teststore.getTestParts().forEach((testPart) => {
+          testPart.getSections().forEach((section) => {
+            // Get values for this section
+            let values = 
+                  this.getSectionVariableValuesByFilter(
+                          section.getIdentifier(),
+                          includeCategory,
+                          excludeCategory,
+                          variableIdentifier)
+
+            // Add values to the result
+            values.forEach((value) => result.push(value))
+          })
+        })
+
+        return result
+      }
+      
+      // sectionIdentifier is specified
+      return this.getSectionVariableValuesByFilter(
+                    sectionIdentifier,
+                    includeCategory,
+                    excludeCategory,
+                    variableIdentifier)
+    },
+
+    /**
+     * @description Retrieve all possible variable values, filtered by Section Identifier,
+     * Include Category, and Exclude Category.
+     * 
+     * @param {*} sectionIdentifier 
+     * @param {*} includeCategory 
+     * @param {*} excludeCategory 
+     * @param {*} variableIdentifier 
+     * @return {Array} array of variable values for the given sectionIdentifier
+     */
+    getSectionVariableValuesByFilter(
+        sectionIdentifier,
+        includeCategory,
+        excludeCategory,
+        variableIdentifier) {
+
+      const result = []
+
+      if (sectionIdentifier === null) return result
+
+      // Section identifier specified.  Scan only item states from the specified section.
+      const section = this.findSectionByIdentifier(sectionIdentifier)
+      const sectionItemState = teststore.getPartSectionMapBySectionIdentifier(sectionIdentifier)
+
+      if (section === null) return result
+      if (sectionItemState === null) return result
+
+      return this.findSectionItemVariableValues(
+                    section,
+                    sectionItemState,
+                    includeCategory,
+                    excludeCategory,
+                    variableIdentifier)
+    },
+
+    /**
+     * @description Loop through all TestPart's, searching for a Section
+     * with the provided identifier.
+     * @param {*} identifier - identifier of the section
+     * @returns {Node} - a section node or null
+     */
+    findSectionByIdentifier (identifier) {
+      let foundSection = null
+
+      teststore.getTestParts().forEach((testPart) => {
+        testPart.getSections().forEach((section) => {
+          if (section.getIdentifier() === identifier) {
+            foundSection = section
+          }
+        })
+      })
+
+      return foundSection
+    },
+
+    /**
+     * @description For the given section node, examine each selected item for the 
+     * given category.  Return an array of matching item nodes.
+     * @param {Node} section - section node
+     * @param {String} category - category to search for
+     * @return {Array} array of item nodes with the provided category
+     */
+    findSectionItemsByCategory (section, category) {
+      // Initialize an empty array
+      const items = []
+
+      if (section === null) return items
+
+      // If no category, just return all items in the section.
+      if (category === null) {
+        for (let item of section.getSectionItemsMap().values()) { 
+          items.push(item)  
+        }
+        return items
+      }
+
+      // Loop through the sectionItemsMap
+      for (let item of section.getSectionItemsMap().values()) {
+
+        // Move on if the item has no category attribute
+        if (item.getCategory() === null) continue
+
+        // The item has a category attribute
+        const categoryTokens = item.getCategory().split(' ')
+        for (let index = 0; index < categoryTokens.length; index++) {
+          if (categoryTokens[index] === category) {
+            // We have a hit!
+            items.push(item)
+            break
+          }
+        }
+      }
+      return items
+    },
+
+    /**
+     * @description Retrieve all item variable values from a section item state, filtered
+     * by section, includeCategory, excludeCategory, and variableIdentifier.
+     * 
+     * @param {Node} section 
+     * @param {Map} sectionItemState 
+     * @param {String} includeCategory 
+     * @param {String} excludeCategory 
+     * @param {String} variableIdentifier 
+     * @return {Array} - array of variable values
+     */
+    findSectionItemVariableValues (
+        section,
+        sectionItemState, 
+        includeCategory, 
+        excludeCategory, 
+        variableIdentifier) {
+      let values = []
+
+      if (section === null) return values
+        
+      //
+      // We have a specific section.  Get a handle on the section's items.
+      // If includeCategory is null, this will return all of the section's items.
+      // If includeCategory is not null, this will return only the items with
+      // a matching category.
+      //
+      let sectionItems = this.findSectionItemsByCategory(section, includeCategory)
+
+      // Remove any section items with the exclude category
+      if (excludeCategory !== null) {
+        const excludedSectionItems = this.findSectionItemsByCategory(section, excludeCategory)
+        excludedSectionItems.forEach((excludedItem) => {
+          let foundIndex = -1
+          for (let i = 0; i<sectionItems.length; i++) {
+            if (sectionItems[i].getIdentifier() === excludedItem.getIdentifier()) {
+              foundIndex = i
+              break
+            }
+          }
+
+          // Delete the item if we found it.
+          if (foundIndex > -1) {
+            sectionItems.splice(foundIndex, 1)
+          }
+        })
+      }
+
+      sectionItems.forEach((item) => {
+        const itemIdentifier = item.getIdentifier()
+        const itemState = sectionItemState.get(itemIdentifier)
+        
+        // No state.  Bail.
+        if (typeof itemState === 'undefined') return
+
+        // Found a state.  Look for the variable with the given identifier
+        const variable = teststore.findItemVariableValueByIdentifier(itemState, variableIdentifier)
+
+        if (variable !== null)
+          values.push({
+            itemIdentifier: itemIdentifier,
+            value: variable.value,
+            baseType: variable.baseType,
+            cardinality: variable.cardinality
+          })
+
+      })
+
+      return values
     },
 
     evaluate () {
@@ -148,14 +376,16 @@ export default {
             ? true 
             : false
 
-        // Retrieve all possible variable values, filtered by Section Identifier,
+        // Retrieve all possible variable values, sectionIdentifier,
         // Include Category, and Exclude Category.
         let variableResults = 
-          teststore.getAllVariableStatesByFilter(
+          this.getAllSectionVariableValuesByFilter(
             this.sectionIdentifier, 
-            this.includeCategory,
-            this.excludeCategory,
+            this.includeCategoryValue,
+            this.excludeCategoryValue,
             this.variableIdentifier)
+
+        console.log('VARIABLE RESULTS:', variableResults)
 
         if (variableResults != null) {
           variableResults.forEach((result) => {
@@ -215,6 +445,11 @@ export default {
 
       // According to the specification, this expression is always multiple cardinality
       this.valueCardinality = 'multiple'
+
+      // Prepare include-category attribute
+      this.includeCategoryValue = this.processIncludeCategoryAttribute()
+      // Prepare exclude-category attribute
+      this.excludeCategoryValue = this.processExcludeCategoryAttribute()
     } catch (err) {
       this.isQtiValid = false
       if (err.name === 'QtiValidationException') {
