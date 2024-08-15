@@ -390,20 +390,34 @@ export default {
         // Found a state.  Look for the variable with the given identifier
         const variable = teststore.findItemVariableValueByIdentifier(itemState, itemVariableIdentifier)
 
-        if (variable !== null)
+        if (variable !== null) {
 
-          // Last part of the filter is baseType.  
-          // If baseType is null, add a value.
-          // If baseType is not null, the variable's baseType must match.
-          if ((this.baseType === null) || 
-              (this.baseType === variable.baseType)) {
-            values.push({
-              itemIdentifier: item.getIdentifier(),
-              value: variable.value,
-              baseType: variable.baseType,
-              cardinality: variable.cardinality
-            })
+          // Last part of the filter is baseType.
+          if (this.baseType === null) {
+
+            // If baseType is null, add a value if the variable's baseType is integer or float.
+            if ((variable.baseType === 'integer') || (variable.baseType === 'float')) {
+              values.push({
+                itemIdentifier: item.getIdentifier(),
+                value: variable.value,
+                baseType: variable.baseType,
+                cardinality: variable.cardinality
+              })
+            }
+            return
           }
+
+          // baseType is not null. The variable's baseType must match the given baseType.
+          if (this.baseType !== variable.baseType) return
+            
+          values.push({
+            itemIdentifier: item.getIdentifier(),
+            value: variable.value,
+            baseType: variable.baseType,
+            cardinality: variable.cardinality
+          })
+
+        } // end variable != null
 
       })
 
@@ -495,7 +509,7 @@ export default {
       this.excludeCategoryValue = this.processExcludeCategoryAttribute()
       // Prepare variable-identifier attribute
       this.processVariableIdentifierAttribute()
-      console.log('variable identifier value:', this.variableIdentifierValue)
+ 
       // @TODO: handle weight-identifier
 
     } catch (err) {
