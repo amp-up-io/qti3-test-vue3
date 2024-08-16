@@ -150,16 +150,19 @@ export default {
     },
 
     processVariableIdentifierAttribute () {
-      if (this.variableIdentifier.length === 0) {
+      const identifier = this.variableIdentifier.trim()
+      if (identifier.length === 0) {
         throw new QtiValidationException('"variable-identifier" attribute must be a valid identifier value')
       }
 
-      const parts = this.variableIdentifier.split('.')
+      const parts = identifier.split('.')
       if (parts.length === 1) {
+        // TODO: proper identifier validation
         return this.variableIdentifierValue = parts[0]
       }
 
       if (parts.length === 2) {
+        // TODO: proper identifier validation of each part
         this.variableItemIdentifierValue = parts[0]
         return this.variableIdentifierValue = parts[1]
       }
@@ -180,12 +183,11 @@ export default {
      * Include Category, Exclude Category, Item Identifier, Item Variable Identifier,
      * and baseType.
      * 
-     * 
-     * @param {String} sectionIdentifier 
-     * @param {String} includeCategory 
-     * @param {String} excludeCategory 
-     * @param {String} itemIdentifier 
-     * @param {String} itemVariableIdentifier 
+     * @param {String} sectionIdentifier - section identifier or null
+     * @param {String} includeCategory - include category or null
+     * @param {String} excludeCategory - exclude category or null
+     * @param {String} itemIdentifier - item identifier (e.g., "ITEM1234" from "ITEM1234.SCORE") or null
+     * @param {String} itemVariableIdentifier - an item variable identifier (e.g., "SCORE").
      * @return {Array} - array of variable values for all sections or for a specific section
      */
     getAllSectionVariableValuesByFilter(
@@ -232,11 +234,11 @@ export default {
      * @description Retrieve all possible variable values, filtered by Section Identifier,
      * Include Category, and Exclude Category.
      * 
-     * @param {String} sectionIdentifier 
-     * @param {String} includeCategory 
-     * @param {String} excludeCategory 
-     * @param {String} itemIdentifier 
-     * @param {String} itemVariableIdentifier 
+     * @param {String} sectionIdentifier - section identifier or null
+     * @param {String} includeCategory - include category or null
+     * @param {String} excludeCategory - exclude category or null
+     * @param {String} itemIdentifier - item identifier (e.g., "ITEM1234" from "ITEM1234.SCORE") or null
+     * @param {String} itemVariableIdentifier - an item variable identifier (e.g., "SCORE").
      * @return {Array} array of variable values for the given sectionIdentifier
      */
     getSectionVariableValuesByFilter(
@@ -290,7 +292,7 @@ export default {
      * @description For the given section node, examine each selected item for the 
      * given category.  Return an array of matching item nodes.
      * @param {Node} section - section node
-     * @param {String} category - category to search for
+     * @param {String} category - category to search for on each item node
      * @return {Array} array of item nodes with the provided category
      */
     findSectionItemsByCategory (section, category) {
@@ -331,11 +333,11 @@ export default {
      * by section, includeCategory, excludeCategory, and variableIdentifier.
      * 
      * @param {Node} section - section node
-     * @param {Map} sectionItemState 
-     * @param {String} includeCategory 
-     * @param {String} excludeCategory 
-     * @param {String} itemIdentifier
-     * @param {String} itemVariableIdentifier 
+     * @param {Map} sectionItemState - Map of all current item states for this section
+     * @param {String} includeCategory - include category or null
+     * @param {String} excludeCategory - exclude category or null
+     * @param {String} itemIdentifier - item identifier (e.g., "ITEM1234" from "ITEM1234.SCORE") or null
+     * @param {String} itemVariableIdentifier - an item variable identifier (e.g., "SCORE").
      * @return {Array} - array of variable values
      */
     findSectionItemVariableValues (
