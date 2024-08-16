@@ -31,8 +31,6 @@ import { ItemFactory } from '@/shared/helpers/ItemFactory'
 import { PnpFactory } from '@/shared/helpers/PnpFactory'
 import { SessionControlFactory } from '@/shared/helpers/SessionControlFactory'
 
-import Swal from 'sweetalert2'
-
 export default {
   name: 'App',
 
@@ -435,16 +433,7 @@ export default {
     },
 
     displayTestAlertEvent (event) {
-      Swal.fire({
-        toast: true,
-        position: 'top-end',
-        icon: event.icon,
-        html: event.message,
-        showConfirmButton: false,
-        showCloseButton: true,
-        timer: 3000,
-        timerProgressBar: true
-      })
+      console.log('displayTestAlertEvent, event:', event)
     },
 
   },
