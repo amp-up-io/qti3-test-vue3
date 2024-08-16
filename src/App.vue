@@ -13,7 +13,7 @@
     </main>
 
     <div>
-      <Qti3TestPlayer
+      <Qti3Test
         ref="qti3TestPlayer"
         @notifyQti3TestPlayerReady="handleTestPlayerReady"
         @notifyQti3TestReady="handleTestReady"
@@ -26,7 +26,7 @@
 
 <script>
 import TopBar from '@/shared/components/TopBar.vue'
-import Qti3TestPlayer from '@/components/Qti3TestPlayer.vue'
+import Qti3Test from '@/components/Qti3Test.vue'
 import { ItemFactory } from '@/shared/helpers/ItemFactory'
 import { PnpFactory } from '@/shared/helpers/PnpFactory'
 import { SessionControlFactory } from '@/shared/helpers/SessionControlFactory'
@@ -38,7 +38,7 @@ export default {
 
   components: {
     TopBar,
-    Qti3TestPlayer
+    Qti3Test
   },
 
   inject: ['$VUE_APP_CONTEXT'],

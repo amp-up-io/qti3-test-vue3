@@ -10,7 +10,7 @@ export default defineConfig({
     lib: {
       // Could also be a dictionary or array of multiple entry points
       entry: resolve(__dirname, 'src/index.js'),
-      name: 'qti3TestVue3',
+      name: 'qti3Test',
       // the proper extensions will be added
       fileName: 'qti3-test-vue3',
     },
@@ -19,6 +19,10 @@ export default defineConfig({
       // into your library
       external: ['vue'],
       output: {
+        assetFileNames: (assetInfo) => {
+          if (assetInfo.name == "style.css") return "qti3TestVue3.css"
+          return assetInfo.name
+        },
         // Provide global variables to use in the UMD build
         // for externalized deps
         globals: {

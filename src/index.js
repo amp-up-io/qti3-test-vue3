@@ -1,7 +1,7 @@
-import Qti3TestPlayer from './components/Qti3TestPlayer.vue'
+import Qti3Test from './components/Qti3Test.vue'
 
 export default {
   install: (app) => {
-    app.component('Qti3TestPlayer', Qti3TestPlayer)
+    app.component('Qti3Test', Qti3Test)
   }
 }

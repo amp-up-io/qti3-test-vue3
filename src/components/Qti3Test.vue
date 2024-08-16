@@ -114,7 +114,7 @@ import QtiTestVariables from '@/components/qti/processing/expressions/QtiTestVar
 const xmlFilters = new XmlFilters()
 
 export default {
-  name: 'Qti3TestPlayer',
+  name: 'Qti3Test',
 
   emits: [
     'notifyQti3TestReady',
