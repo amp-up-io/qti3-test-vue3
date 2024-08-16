@@ -1,6 +1,6 @@
 {
   "name": "qti3-test-vue3",
-  "version": "0.0.1",
+  "version": "0.1.0",
   "description": "QTI 3 Test Component implemented with Vue 3",
   "author": {
     "name": "Paul Grudnitski",
@@ -38,7 +38,6 @@
     "axios": "^1.7.2",
     "bignumber.js": "^9.1.2",
     "fast-printf": "^1.6.9",
-    "sweetalert2": "^11.6.13",
     "tippy.js": "^6.3.7",
     "vue": "^3.4.34"
   },
