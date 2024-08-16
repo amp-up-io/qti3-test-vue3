@@ -3,7 +3,7 @@
       <div class="container-fluid">
         <div class="navbar-brand router-link">
             <img src="@/assets/amp-up-io.svg" class="bi me-2" width="32" height="32" alt=""/>
-            Test Runner
+            QTI 3 Test 
         </div>
         <button class="btn btn-outline-secondary" @click="handleEndAttemptClick" type="button">
           End Attempt
