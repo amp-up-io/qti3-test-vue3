@@ -1,8 +1,34 @@
 {
-  "name": "qti3-test-player-vue3",
-  "private": true,
+  "name": "qti3-test-vue3",
   "version": "0.0.1",
+  "description": "QTI 3 Test Component implemented with Vue 3",
+  "author": {
+    "name": "Paul Grudnitski",
+    "email": "paul.grudnitski@amp-up.io"
+  },
+  "license": "MIT",
+  "private": false,
+  "keywords": [
+    "QTI3",
+    "QTI 3",
+    "assessment-test",
+    "test",
+    "component",
+    "Vue 3"
+  ],
   "type": "module",
+  "files": [
+    "dist"
+  ],
+  "main": "./dist/qti3-test-vue3.umd.js",
+  "module": "./dist/qti3-test-vue3.js",
+  "exports": {
+    ".": {
+      "import": "./dist/qti3-test-vue3.js",
+      "require": "./dist/qti3-test-vue3.umd.js"
+    },
+    "./dist/qti3TestVue3.css": "./dist/qti3TestVue3.css"
+  },
   "scripts": {
     "dev": "vite",
     "build": "vite build",
