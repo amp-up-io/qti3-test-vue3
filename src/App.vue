@@ -71,11 +71,7 @@ export default {
       /*
        * Test's Pnp Factory
        */
-      pnp: null,
-      /*
-       * PCI configuration default
-       */
-      pciContext: { renderer2p0: './assets/pci/pci.html' }
+      pnp: null
     }
   },
 
