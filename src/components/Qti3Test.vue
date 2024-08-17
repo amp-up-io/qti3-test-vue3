@@ -14,6 +14,8 @@
 import { ref, computed, getCurrentInstance, onErrorCaptured } from 'vue'
 import { teststore } from '@/store/teststore'
 import { XmlFilters } from '@/shared/helpers/XmlFilters'
+import AmpAudio from '@/components/qti/html/AmpAudio.vue'
+import AmpVideo from '@/components/qti/html/AmpVideo.vue'
 import QtiAssessmentTest from '@/components/qti/QtiAssessmentTest.vue'
 import QtiContextDeclaration from '@/components/qti/declarations/QtiContextDeclaration.vue'
 import QtiOutcomeDeclaration from '@/components/qti/declarations/QtiOutcomeDeclaration.vue'
@@ -129,17 +131,6 @@ export default {
     // load all qti-assessment-test components - if they have not already
     // been loaded by some other usage of the Qti3TestPlayer component.
     loadQtiTestComponents(getCurrentInstance().appContext)
-
-
-      /*
-    Vue.component('qti-context-declaration', QtiContextDeclaration)
-Vue.component('qti-outcome-declaration', QtiOutcomeDeclaration)
-Vue.component('qti-time-limits', QtiTimeLimits)
-Vue.component('qti-stylesheet', QtiStylesheet)
-Vue.component('qti-rubric-block', QtiRubricBlock)
-Vue.component('qti-test-part', QtiTestPart)
-Vue.component('qti-outcome-processing', QtiOutcomeProcessing)
-*/
 
     // data
     let testXml = ref('')
@@ -296,6 +287,8 @@ Vue.component('qti-outcome-processing', QtiOutcomeProcessing)
         .component('qti-outcome-declaration', QtiOutcomeDeclaration)
         .component('qti-rubric-block', QtiRubricBlock)
         .component('qti-content-body', QtiContentBody)
+        .component('amp-audio', AmpAudio)
+        .component('amp-video', AmpVideo)
         .component('qti-stylesheet', QtiStylesheet)
         .component('qti-time-limits', QtiTimeLimits)
         .component('qti-item-session-control', QtiItemSessionControl)
