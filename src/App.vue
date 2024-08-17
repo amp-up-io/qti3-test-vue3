@@ -27,7 +27,6 @@
 <script>
 import TopBar from '@/shared/components/TopBar.vue'
 import Qti3Test from '@/components/Qti3Test.vue'
-import { ItemFactory } from '@/shared/helpers/ItemFactory'
 import { PnpFactory } from '@/shared/helpers/PnpFactory'
 import { SessionControlFactory } from '@/shared/helpers/SessionControlFactory'
 
@@ -47,14 +46,6 @@ export default {
        * The test context loaded by the webpage
        */
       appContext: {
-        // Base URL for making api calls
-        baseUrl: '',
-        // Api prefix string for content api calls
-        apiPrefix: '',
-        // Api jwt
-        token: '',
-        // Project containing the test
-        projectGuid: '',
         // Tracking session guid
         sessionGuid: '0',
         // Test identifier
@@ -68,57 +59,14 @@ export default {
       containerClass: 'qti3-player-container-fluid',
       colorClass: 'qti3-player-color-default',
       containerPaddingClass: 'qti3-player-container-padding-2',
-
-      /*
-       * The currently displayed Panel
-       */
-      currentPanel: '',
-
       /*
        * Instance of the QTI 3 Test Player
        */
       qti3TestPlayer: null,
-
       /*
-       * State info for currently loaded Test
+       * An assessmentTest component 
        */
-      testTitle: 'Loading Test...',
-      testIdentifier: '',
-      testParts: [],
-      countTestParts: 0,
-      currentPartIndex: 0,
-
-      /*
-       * State info for currently loaded Test Part
-       */
-      partTitle: '',
-      partIdentifier: '',
-      partNavigationMode: '',
-      partSubmissionMode: '',
-      partSections: [],
-      countPartSections: 0,
-      currentSectionIndex: 0,
-
-      /*
-       * State info for currently loaded Section
-       */
-      sectionTitle: '',
-      sectionIdentifier: '',
-      sectionRequired: '',
-      sectionFixed: '',
-      sectionVisible: '',
-      sectionKeepTogether: '',
-      sectionItemIdentifiers: [],
-      countSectionItems: 0,
-      currentItemIndex: 0,
-
-      // Usually the same as countSectionItems, but may be overriden
-      countSectionMaxItems: 0,
-
-      /*
-       * Item Factory
-       */
-      itemFactory: null,
+      test: null,
       /*
        * Save/Restore a candidate's item state here
        */
@@ -127,10 +75,6 @@ export default {
        * Context configuration
        */
       cfg: null,
-      /*
-       * Test's Item Session Control Factory
-       */
-      sessionControl: null,
       /*
        * Test's Pnp Factory
        */
@@ -145,8 +89,6 @@ export default {
   methods: {
 
     initialize () {
-      // Initialize item factory
-      this.itemFactory = new ItemFactory(this.appContext)
       // Initialize item state hashmap
       this.itemStates = new Map()
     },
@@ -168,24 +110,14 @@ export default {
       }
 
       const context = this.$VUE_APP_CONTEXT
-      this.appContext.baseUrl = context?.summary?.baseUrl || ''
-      this.appContext.apiPrefix = context?.summary?.apiPrefix || ''
-      this.appContext.token = context?.summary?.token || ''
       this.appContext.xml = context?.summary?.xml || ''
-      this.appContext.sessionGuid = context?.summary?.sessionGuid || '0'
-      this.appContext.projectGuid = context?.summary?.projectGuid || ''
       this.appContext.identifier = context?.summary?.identifier || ''
 
       // Save the context configuration
       this.cfg = context?.cfg || null
       
-      // Save the pci context
-      this.pciContext.renderer2p0 = context?.cfg?.pciContext?.renderer2p0 || './assets/pci/pci.html'
-
       // Load pnp
       this.pnp = new PnpFactory()
-      // Load sessionControl
-      this.sessionControl = new SessionControlFactory()
     },
 
     getTestConfiguration (sessionGuid) {
@@ -218,12 +150,18 @@ export default {
      * component's loading of XML.
      */
     handleTestReady () {
-      const assessmentTest = this.qti3TestPlayer.getTest()
-      this.testTitle = assessmentTest.getTitle().length == 0 ? '<No Test Title>' : assessmentTest.getTitle()
-      this.testIdentifier = assessmentTest.getIdentifier()
-      this.testParts = assessmentTest.getTestParts()
-      this.countTestParts = this.testParts.length
-      this.currentPartIndex = 0
+      // Use the player's getTest() method to get a handle on the
+      // QTI 3 assessmentTest component and all exposed methods.
+      this.test = this.qti3TestPlayer.getTest()
+
+
+      //this.testIdentifier = assessmentTest.getIdentifier()
+      //this.testTitle = 
+      //    assessmentTest.getTitle().length == 0 
+      //      ? '<No Test Title>' 
+      //      : assessmentTest.getTitle()
+      //this.testParts = assessmentTest.getTestParts()
+
     },
 
     handleInitiateTestEndAttempt () {
@@ -399,37 +337,6 @@ export default {
 
     getItemStateTrackingGuid (sectionIdentifier, itemIdentifier) {
       return `${sectionIdentifier}~~${itemIdentifier}`
-    },
-
-    computeItemSubmissionMode () {
-      // Return the current part's submission mode
-      return this.partSubmissionMode
-    },
-
-    getItemConfiguration (guid) {
-      const configuration = {}
-
-      // Fetch prior state from Test State
-      const state = this.getTestStateItemState(guid)
-      if (typeof state !== 'undefined') configuration.state = state
-
-      // IMPORTANT: Stamp the item's tracking guid onto the configuration
-      configuration.guid = guid
-      configuration.pnp = this.pnp.getPnp()
-      configuration.sessionControl = this.sessionControl.getSessionControl()
-
-      // Add pciContext to configuration
-      configuration.pciContext = this.pciContext
-
-      return configuration
-    },
-
-    isSubmissionModeIndividual () {
-      return this.partSubmissionMode === 'individual'
-    },
-
-    isNavigationModeLinear () {
-      return this.partNavigationMode === 'linear'
     },
 
     displayTestAlertEvent (event) {
