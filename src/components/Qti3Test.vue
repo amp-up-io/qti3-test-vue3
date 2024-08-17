@@ -147,8 +147,8 @@ export default {
       xml = xmlFilters.filterCdata(xml)
       // Hack 3: Replace <style> tags with <amp-style>
       xml = xmlFilters.filterStyle(xml)
-      // Hack 4: Replace <audio> tags with <amp-audio>
-      xml = xmlFilters.filterAudio(xml)
+      // Hack 4: Replace <audio> tags with <amp-audio>, <video> tags with <amp-video
+      xml = xmlFilters.filterMedia(xml)
 
       return {
         template: '<div id="qti-test-container">' + xml + '</div>'
