@@ -345,12 +345,12 @@ export default {
       // For debugging purposes
       this.printOutcomeDeclarations()
 
-      //this.evaluatePrintedVariables()
-
-      // Show feedbacks if itemSessionControl.showFeedback=true
-      //if (store.getItemContextSessionControl().getShowFeedback()) {
-      //  this.evaluateFeedbacks()
-      //}
+      //
+      // this.evaluatePrintedVariables()
+      //
+      //
+      // TODO: Evaluate qti-test-feedback (atEnd, during) ??
+      //
 
       console.log('[ProcessOutcomes][Completed]')
     },
