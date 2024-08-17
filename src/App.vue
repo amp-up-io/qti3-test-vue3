@@ -28,7 +28,6 @@
 import TopBar from '@/shared/components/TopBar.vue'
 import Qti3Test from '@/components/Qti3Test.vue'
 import { PnpFactory } from '@/shared/helpers/PnpFactory'
-import { SessionControlFactory } from '@/shared/helpers/SessionControlFactory'
 
 export default {
   name: 'App',
@@ -53,12 +52,6 @@ export default {
         // Test QTI 3 xml
         xml: '',
       },
-      /*
-       * Initial player chrome settings
-       */
-      containerClass: 'qti3-player-container-fluid',
-      colorClass: 'qti3-player-color-default',
-      containerPaddingClass: 'qti3-player-container-padding-2',
       /*
        * Instance of the QTI 3 Test Player
        */
