@@ -18,6 +18,7 @@
  * and normalMinimum, especially if this range differs from [0,1].
  */
 import { teststore } from '@/store/teststore'
+import { store } from '@/store/store'
 import QtiValidationException from '@/components/qti/exceptions/QtiValidationException'
 import QtiEvaluationException from '@/components/qti/exceptions/QtiEvaluationException'
 import QtiParseException from '@/components/qti/exceptions/QtiParseException'
@@ -137,7 +138,9 @@ export default {
       // normalMinimum float value
       normalMinimumValue: null,
       // masteryValue float value
-      masteryValueValue: null
+      masteryValueValue: null,
+      // default declaration context: TEST or ITEM
+      declarationContext: 'ITEM'
     }
   },
 
@@ -220,6 +223,17 @@ export default {
     },
 
     /**
+     * @description Determine if we are declared inside of a 
+     * QtiAssessmentTest or a QtiAssessmentItem.
+     */
+    computeDeclarationContext () {
+      this.declarationContext =
+            (this.$parent?.$parent?.$options?.name === 'QtiAssessmentTest')
+              ? 'TEST' 
+              : 'ITEM'
+    },
+
+    /**
      * Validate the optional child nodes: 
      * [0-1] qti-default-value
      * [0-1] qti-match-table || qti-interpolation-table
@@ -294,6 +308,9 @@ export default {
 
   created () {
     try {
+      // Compute our context: TEST or ITEM
+      this.computeDeclarationContext()
+
       qtiAttributeValidation.validateCardinality(this.cardinality)
       qtiAttributeValidation.validateBaseTypeAndCardinality(this.baseType, this.cardinality === 'record')
       qtiAttributeValidation.validateIdentifierAttribute(this.identifier)
@@ -322,10 +339,7 @@ export default {
         }
       }
 
-      // Notify teststore of our initial model.  We need this Initial
-      // definition before we can properly parse outcome variable references
-      // in the rest of the test.
-      teststore.defineOutcomeDeclaration({
+      const obj = {
           identifier: this.identifier,
           baseType: this.getBaseType(),
           cardinality: this.getCardinality(),
@@ -340,7 +354,15 @@ export default {
           value: null,
           defaultValue: null,
           node: this
-        })
+        }
+
+      // Notify store or teststore of our initial model.  We need this Initial
+      // definition before we can properly parse outcome variable references
+      // in the rest of the test or item.
+      if (this.declarationContext === 'TEST')
+        teststore.defineOutcomeDeclaration(obj)
+      else
+        store.defineOutcomeDeclaration(obj)
 
     } catch (err) {
       this.isQtiValid = false
@@ -361,7 +383,7 @@ export default {
 
         this.initializeValue()
 
-        teststore.defineOutcomeDeclaration({
+        const obj = {
             identifier: this.identifier,
             baseType: this.getBaseType(),
             cardinality: this.getCardinality(),
@@ -378,9 +400,15 @@ export default {
             lookupTable: this.lookupTable,
             lookupTableType: this.lookupTableType,
             node: this
-          })
+          }
 
-        console.log('[' + this.$options.name + '][' + this.identifier + '][DefaultValue]', this.defaultValue, '[lookupTable]', this.lookupTable)
+        // Notify store or teststore of our updated model.
+        if (this.declarationContext === 'TEST')
+          teststore.defineOutcomeDeclaration(obj)
+        else
+          store.defineOutcomeDeclaration(obj)
+
+        console.log('[' + this.$options.name + '][' + this.identifier + '][' + this.declarationContext + '][DefaultValue]', this.defaultValue, '[lookupTable]', this.lookupTable)
       } catch (err) {
         this.isQtiValid = false
         if (err.name === 'QtiValidationException') {
