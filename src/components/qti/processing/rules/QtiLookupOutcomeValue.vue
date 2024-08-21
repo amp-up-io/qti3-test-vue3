@@ -37,6 +37,10 @@ export default {
 
   methods: {
 
+    getStore () {
+      return teststore
+    },
+
     /**
      * Implements several validation checks on aspects of the lookupTable and expression.
      * @param declaration { object } - the outcome declaration pulled from the $store
@@ -77,34 +81,56 @@ export default {
      */
     validateChildren () {
       let countExpression = 0
+
+      if (!this.$slots.default) {
+        throw new QtiValidationException('Must have one Expression node')
+      }
+
       this.$slots.default().forEach((slot) => {
         if (qtiAttributeValidation.isValidSlot(slot)) {
           // Detect an expression
-          if (qtiProcessing.isExpressionNode(slot.componentOptions.tag)) {
+          if (qtiProcessing.isExpressionNode(qtiAttributeValidation.kebabCase(slot.type.name))) {
             countExpression += 1
           } else {
-            throw new QtiValidationException('Node is not an Expression: "' + slot.componentOptions.tag + '"')
+            throw new QtiValidationException('Node is not an Expression: "' + slot.type.name + '"')
           }
         }
       })
+
       if (countExpression !== 1) {
         throw new QtiValidationException('Must have exactly one Expression node')
       }
-      // Ensure expression has suitable baseType and cardinality
-      this.validateRequiredBaseTypeAndCardinality(qtiAttributeValidation.validateOutcomeIdentifierAttribute(teststore, this.identifier), this.$children[0])
-      // All good.  Save off our children.
-      this.processChildren()
     },
 
     processChildren () {
-      this.expression = this.$children[0]
+      const children = this.$.subTree.children[0].children
+
+      // Perform extra semantic validations on the expression
+      this.validateExpressions(children)
+      
+      children.forEach((expression) => {
+        if (expression.component === null) return
+        this.expression = expression.component.proxy
+      })
+    },
+
+    validateExpressions (expressions) {
+      expressions.forEach((expression) => {
+        if (expression.component === null) return
+        // Ensure expression has suitable baseType and cardinality
+        this.validateRequiredBaseTypeAndCardinality(
+              qtiAttributeValidation.validateOutcomeIdentifierAttribute(
+                this.getStore(), 
+                this.identifier), 
+              expression.component.proxy)
+      })
     },
 
     evaluate () {
       try {
         let value = this.expression.evaluate()
 
-        let declaration = qtiAttributeValidation.validateOutcomeIdentifierAttribute(teststore, this.identifier)
+        let declaration = qtiAttributeValidation.validateOutcomeIdentifierAttribute(this.getStore(), this.identifier)
         if (typeof declaration === 'undefined') {
           throw new QtiEvaluationException('Outcome variable not found for identifier: "' + this.identifier + '"')
         }
@@ -125,7 +151,7 @@ export default {
         console.log('[LookupOutcomeValue][' + this.identifier + '][Expression]', numericValue, '[TargetValue]', targetValue)
 
         // Notify store of our targetValue
-        teststore.setOutcomeVariableValue({
+        this.getStore().setOutcomeVariableValue({
             identifier: this.identifier,
             value: targetValue
           })
@@ -145,7 +171,8 @@ export default {
 
   created () {
     try {
-      qtiAttributeValidation.validateOutcomeIdentifierAttribute(teststore, this.identifier)
+      qtiAttributeValidation.validateOutcomeIdentifierAttribute(this.getStore(), this.identifier)
+      this.validateChildren()
     } catch (err) {
       this.isQtiValid = false
       if (err.name === 'QtiValidationException') {
@@ -159,7 +186,7 @@ export default {
   mounted () {
     if (this.isQtiValid) {
       try {
-        this.validateChildren()
+        this.processChildren()
       } catch (err) {
         this.isQtiValid = false
         throw new QtiValidationException(err.message)
