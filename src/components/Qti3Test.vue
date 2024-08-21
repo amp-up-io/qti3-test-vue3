@@ -198,6 +198,14 @@ export default {
       return test.value
     }
 
+    /**
+     * @description Utility method to provide direct access to the teststore.
+     * @return {Object} teststore
+     */
+    function getTeststore () {
+      return teststore
+    }
+
     function loadTestContextFromConfiguration (configuration) {
       if (typeof configuration === 'undefined') return
 
@@ -280,16 +288,11 @@ export default {
 
       const app = appContext.app
 
-      // Top-level Test elements
+      // 
+      // Load Test-only elements
+      //
       app
         .component('qti-assessment-test', QtiAssessmentTest)
-        .component('qti-context-declaration', QtiContextDeclaration)
-        .component('qti-outcome-declaration', QtiOutcomeDeclaration)
-        .component('qti-rubric-block', QtiRubricBlock)
-        .component('qti-content-body', QtiContentBody)
-        .component('amp-audio', AmpAudio)
-        .component('amp-video', AmpVideo)
-        .component('qti-stylesheet', QtiStylesheet)
         .component('qti-time-limits', QtiTimeLimits)
         .component('qti-item-session-control', QtiItemSessionControl)
         .component('qti-test-part', QtiTestPart)
@@ -297,8 +300,34 @@ export default {
         .component('qti-assessment-item-ref', QtiAssessmentItemRef)
         .component('qti-ordering', QtiOrdering)
         .component('qti-selection', QtiSelection)
-        .component('qti-catalog-info', QtiCatalogInfo)
         .component('qti-outcome-processing', QtiOutcomeProcessing)
+
+      // Outcome Processing Rules
+      app
+        .component('qti-outcome-condition', QtiOutcomeCondition)
+        .component('qti-outcome-processing-fragment', QtiOutcomeProcessingFragment)
+        .component('qti-exit-test', QtiExitTest)
+        .component('qti-outcome-if', QtiOutcomeIf)
+        .component('qti-outcome-else', QtiOutcomeElse)
+        .component('qti-outcome-else-if', QtiOutcomeElseIf)
+
+
+      // Test-only Expressions
+      app
+        .component('qti-test-variables', QtiTestVariables)
+
+
+      if (typeof appContext.components['qti-assessment-item'] !== 'undefined') return
+
+      app
+        .component('qti-context-declaration', QtiContextDeclaration)
+        .component('qti-outcome-declaration', QtiOutcomeDeclaration)
+        .component('qti-rubric-block', QtiRubricBlock)
+        .component('qti-content-body', QtiContentBody)
+        .component('amp-audio', AmpAudio)
+        .component('amp-video', AmpVideo)
+        .component('qti-stylesheet', QtiStylesheet)
+        .component('qti-catalog-info', QtiCatalogInfo)
 
       // Declaration elements
       app
@@ -311,7 +340,7 @@ export default {
         .component('qti-match-table', QtiMatchTable)
         .component('qti-match-table-entry', QtiMatchTableEntry)
         .component('qti-area-mapping', QtiAreaMapping)
-      
+
       // Catalog elements
       app
         .component('qti-catalog', QtiCatalog)
@@ -320,19 +349,12 @@ export default {
         .component('qti-html-content', QtiHtmlContent)
         .component('qti-file-href', QtiFileHref)
 
-      // Outcome Processing Rules
+      // Response Processing AND Outcome Processing Rule elements
       app
-        .component('qti-outcome-condition', QtiOutcomeCondition)
-        .component('qti-outcome-processing-fragment', QtiOutcomeProcessingFragment)
         .component('qti-set-outcome-value', QtiSetOutcomeValue)
-        .component('qti-exit-test', QtiExitTest)
-        .component('qti-lookup-outcome-value', QtiLookupOutcomeValue)
-        .component('qti-outcome-if', QtiOutcomeIf)
-        .component('qti-outcome-else', QtiOutcomeElse)
-        .component('qti-outcome-else-if', QtiOutcomeElseIf)
         .component('qti-set-default-value', QtiSetDefaultValue)
+        .component('qti-lookup-outcome-value', QtiLookupOutcomeValue)
 
-      // Expressions
       app
         .component('qti-base-value', QtiBaseValue)
         .component('qti-correct', QtiCorrect)
@@ -383,7 +405,6 @@ export default {
         .component('qti-lcm', QtiLcm)
         .component('qti-power', QtiPower)
         .component('qti-any-n', QtiAnyN)
-        .component('qti-test-variables', QtiTestVariables)
     }
 
     onErrorCaptured((err, vm) => {
@@ -396,6 +417,7 @@ export default {
       loadTestFromXml,
       endAttempt,
       getTest,
+      getTeststore,
       setTestStateItemState,
       getAllTestStateItemStates,
       handleTestReady,
