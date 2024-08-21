@@ -357,8 +357,10 @@ export default {
 
     resetOutcomeDeclarations () {
       teststore.getOutcomeDeclarations().forEach((od) => {
+        // Do not reset the built-in 'duration' variable
+        if (od.identifier === 'duration') return
         this.resetOutcomeDeclaration(od)
-      }, this)
+      })
     },
 
     resetOutcomeDeclaration (declaration) {
