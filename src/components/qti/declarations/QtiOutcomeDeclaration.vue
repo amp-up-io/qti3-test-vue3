@@ -18,7 +18,6 @@
  * and normalMinimum, especially if this range differs from [0,1].
  */
 import { teststore } from '@/store/teststore'
-import { store } from '@/store/store'
 import QtiValidationException from '@/components/qti/exceptions/QtiValidationException'
 import QtiEvaluationException from '@/components/qti/exceptions/QtiEvaluationException'
 import QtiParseException from '@/components/qti/exceptions/QtiParseException'
@@ -139,8 +138,8 @@ export default {
       normalMinimumValue: null,
       // masteryValue float value
       masteryValueValue: null,
-      // default declaration context: TEST or ITEM
-      declarationContext: 'ITEM'
+      // default declaration context: TEST
+      declarationContext: 'TEST'
     }
   },
 
@@ -186,6 +185,13 @@ export default {
       return this.defaultValue
     },
 
+    /*
+     * Outcome declarations occur in items and tests
+     */
+    getDeclarationContext () {
+      return this.declarationContext
+    },
+
     /**
      * Utility method to reset value of this variable to default.
      */
@@ -216,21 +222,14 @@ export default {
     reset () {
       this.initializeValue()
       // Notify store of our value
-      teststore.setOutcomeVariableValue({
+      this.getStore().setOutcomeVariableValue({
           identifier: this.identifier,
           value: this.getValue()
         })
     },
 
-    /**
-     * @description Determine if we are declared inside of a 
-     * QtiAssessmentTest or a QtiAssessmentItem.
-     */
-    computeDeclarationContext () {
-      this.declarationContext =
-            (this.$parent?.$parent?.$options?.name === 'QtiAssessmentTest')
-              ? 'TEST' 
-              : 'ITEM'
+    getStore () {
+      return teststore
     },
 
     /**
@@ -308,9 +307,6 @@ export default {
 
   created () {
     try {
-      // Compute our context: TEST or ITEM
-      this.computeDeclarationContext()
-
       qtiAttributeValidation.validateCardinality(this.cardinality)
       qtiAttributeValidation.validateBaseTypeAndCardinality(this.baseType, this.cardinality === 'record')
       qtiAttributeValidation.validateIdentifierAttribute(this.identifier)
@@ -339,7 +335,10 @@ export default {
         }
       }
 
-      const obj = {
+      // Notify teststore of our initial model.  We need this Initial
+      // definition before we can properly parse outcome variable references
+      // in the rest of the test.
+      this.getStore().defineOutcomeDeclaration({
           identifier: this.identifier,
           baseType: this.getBaseType(),
           cardinality: this.getCardinality(),
@@ -354,15 +353,7 @@ export default {
           value: null,
           defaultValue: null,
           node: this
-        }
-
-      // Notify store or teststore of our initial model.  We need this Initial
-      // definition before we can properly parse outcome variable references
-      // in the rest of the test or item.
-      if (this.declarationContext === 'TEST')
-        teststore.defineOutcomeDeclaration(obj)
-      else
-        store.defineOutcomeDeclaration(obj)
+        })
 
     } catch (err) {
       this.isQtiValid = false
@@ -383,7 +374,8 @@ export default {
 
         this.initializeValue()
 
-        const obj = {
+        // Notify teststore of our updated model.
+        this.getStore().defineOutcomeDeclaration({
             identifier: this.identifier,
             baseType: this.getBaseType(),
             cardinality: this.getCardinality(),
@@ -400,13 +392,7 @@ export default {
             lookupTable: this.lookupTable,
             lookupTableType: this.lookupTableType,
             node: this
-          }
-
-        // Notify store or teststore of our updated model.
-        if (this.declarationContext === 'TEST')
-          teststore.defineOutcomeDeclaration(obj)
-        else
-          store.defineOutcomeDeclaration(obj)
+          })
 
         console.log('[' + this.$options.name + '][' + this.identifier + '][' + this.declarationContext + '][DefaultValue]', this.defaultValue, '[lookupTable]', this.lookupTable)
       } catch (err) {

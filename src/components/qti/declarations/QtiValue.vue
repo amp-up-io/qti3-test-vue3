@@ -179,13 +179,17 @@ export default {
         }
         this.valueBaseType = variableBaseType
       }
+    },
+
+    getStore () {
+      return teststore
     }
 
   },
 
   created: function() {
     try {
-      let declaration = qtiAttributeValidation.validateVariableIdentifierAttribute (teststore, this.$parent.$parent.$props.identifier)
+      let declaration = qtiAttributeValidation.validateVariableIdentifierAttribute (this.getStore(), this.$parent.$parent.$props.identifier)
 
       if (typeof declaration === 'undefined') {
         // Did not find required variable declaration

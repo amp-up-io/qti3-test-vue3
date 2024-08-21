@@ -12,7 +12,6 @@
  * values retrieved during outcomeProcessing.
  */
 import { teststore } from '@/store/teststore'
-import { store } from '@/store/store'
 import QtiValidationException from '@/components/qti/exceptions/QtiValidationException'
 import QtiEvaluationException from '@/components/qti/exceptions/QtiEvaluationException'
 import QtiParseException from '@/components/qti/exceptions/QtiParseException'
@@ -49,8 +48,8 @@ export default {
       defaultValue: null,
       // internal validation status
       isQtiValid: true,
-      // default declaration context: TEST or ITEM
-      declarationContext: 'ITEM'
+      // default declaration context: TEST
+      declarationContext: 'TEST'
     }
   },
 
@@ -84,6 +83,13 @@ export default {
       return this.defaultValue
     },
 
+    /*
+     * Context declarations occur in items and tests
+     */
+    getDeclarationContext () {
+      return this.declarationContext
+    },
+
     /**
      * Utility method to resets value of this variable to default.
      */
@@ -104,15 +110,8 @@ export default {
       this.initializeValue()
     },
 
-    /**
-     * @description Determine if we are declared inside of a 
-     * QtiAssessmentTest or a QtiAssessmentItem.
-     */
-    computeDeclarationContext () {
-      this.declarationContext =
-            (this.$parent?.$parent?.$options?.name === 'QtiAssessmentTest')
-              ? 'TEST' 
-              : 'ITEM'
+    getStore () {
+      return teststore
     },
 
     /**
@@ -161,31 +160,23 @@ export default {
 
   created: function() {
     try {
-      // Compute our context: TEST or ITEM
-      this.computeDeclarationContext()
-
       qtiAttributeValidation.validateCardinality(this.cardinality)
       qtiAttributeValidation.validateBaseTypeAndCardinality(this.baseType, this.cardinality === 'record')
       qtiAttributeValidation.validateIdentifierAttribute(this.identifier)
 
       this.validateChildren()
 
-      const obj = {
+      // Notify teststore of our initial model.  We need this Initial
+      // definition before we can properly parse template variable references
+      // in the rest of the test.
+      this.getStore().defineContextDeclaration({
           identifier: this.identifier,
           baseType: this.getBaseType(),
           cardinality: this.getCardinality(),
           value: null,
           resetValue: this.reset,
           defaultValue: null
-        }
-
-      // Notify store or teststore of our initial model.  We need this Initial
-      // definition before we can properly parse template variable references
-      // in the rest of the test
-      if (this.declarationContext === 'TEST')
-        teststore.defineContextDeclaration(obj)
-      else
-        store.defineContextDeclaration(obj)
+        })
 
     } catch (err) {
       this.isQtiValid = false
@@ -206,20 +197,15 @@ export default {
 
         this.initializeValue()
 
-        const obj = {
-            identifier: this.identifier,
-            baseType: this.getBaseType(),
-            cardinality: this.getCardinality(),
-            value: this.getValue(),
-            resetValue: this.reset,
-            defaultValue: this.defaultValue
-          }
-
-        // Notify store or teststore of our updated model.
-        if (this.declarationContext === 'TEST')
-          teststore.defineContextDeclaration(obj)
-        else
-          store.defineContextDeclaration(obj)
+        // Notify teststore of our updated model.
+        this.getStore().defineContextDeclaration({
+          identifier: this.identifier,
+          baseType: this.getBaseType(),
+          cardinality: this.getCardinality(),
+          value: null,
+          resetValue: this.reset,
+          defaultValue: null
+        })
 
         console.log('[' + this.$options.name + '][' + this.identifier + '][' + this.declarationContext + '][DefaultValue]', this.defaultValue)
       } catch (err) {
