@@ -1,5 +1,6 @@
 import { RecordField } from '@/shared/helpers/RecordField'
 import { PnpFactory } from '@/shared/helpers/PnpFactory'
+import { TestTimer } from '@/shared/helpers/TestTimer'
 
 export const teststore = {
 
@@ -33,6 +34,8 @@ export const teststore = {
     guid: null,
     pnp: null
   },
+
+  testTimer: new TestTimer(),
 
   /*
    * Save/Restore a candidate's test item state here.
@@ -205,6 +208,7 @@ export const teststore = {
     this.state.printedVariables.splice(0, this.state.printedVariables.length)
     this.state.catalogs.splice(0, this.state.catalogs.length)
     this.state.scoringRubricBlocks.splice(0, this.state.scoringRubricBlocks.length)
+    this.resetTestTimer()
     // Reset testContext
     this.testContext.guid = null
     this.testContext.state = null
@@ -281,6 +285,31 @@ export const teststore = {
     }
 
     declaration.value = null
+  },
+
+  /**
+   * Snapshot the Test Timer, augment the 'duration' outcome variable,
+   * then restart the Test Timer. 
+   */
+  updateTestDuration () {
+    const duration = this.getOutcomeDeclaration('duration')
+    duration.value += this.testTimer.getTime()
+    console.log('UpdateTestDuration, new duration:', duration.value)
+    this.restartTestTimer()
+  },
+
+  /**
+   * Set the Test Timer time back to 0 and start the Timer.
+   */
+  restartTestTimer () {
+    this.testTimer.startTimer()
+  },
+
+  /**
+   * Stop the Test Timer and set the Timer time back to 0.
+   */
+  resetTestTimer () {
+    this.testTimer.resetTimer()
   },
 
   getTestContextGuid () {
