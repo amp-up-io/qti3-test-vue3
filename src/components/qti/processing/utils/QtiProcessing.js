@@ -663,4 +663,21 @@ export default class QtiProcessing {
     return variable.correctResponse    
   }
 
+  computeProcessingContext (node) {
+    return (this.computeProcessingType(node) === 'OUTCOME') 
+        ? 'TEST'
+        : 'ITEM'
+  }
+
+  computeProcessingType (node) {
+    if (node === null) return 'UNKNOWN'
+    if (node.$options.name === 'QtiOutcomeProcessing') return 'OUTCOME'
+    if (node.$options.name === 'QtiResponseProcessing') return 'RESPONSE'
+    if (node.$options.name === 'QtiTemplateProcessing') return 'TEMPLATE'
+    if (node.$options.name === 'QtiBranchRule') return 'OUTCOME'
+
+    // Inspect the node's parent
+    return this.computeProcessingType(node.$parent)
+  }
+
 }
