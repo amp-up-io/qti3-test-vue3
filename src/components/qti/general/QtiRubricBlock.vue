@@ -14,6 +14,7 @@
  * content is hidden including conditionally visible elements for which the conditions
  * are satisfied and that therefore would otherwise be visible.
  */
+import { teststore } from '@/store/teststore'
 import QtiValidationException from '@/components/qti/exceptions/QtiValidationException'
 import QtiAttributeValidation from '@/components/qti/validation/QtiAttributeValidation'
 
@@ -51,6 +52,7 @@ export default {
 
   data () {
     return {
+      rubricBlockContext: 'TEST',
       isQtiValid: true
     }
   },
@@ -81,6 +83,10 @@ export default {
       return this.$refs.root.innerHTML
     },
 
+    getStore () {
+      return teststore
+    },
+
     validateChildren () {
       // TODO: ??
     },
@@ -94,6 +100,8 @@ export default {
         this.$refs.root.classList.remove('hidden')
         return
       }
+      // It's a scoring rubric, smoke the DOM.
+      this.$refs.root.innerHTML = ''
     }
 
   },
@@ -101,6 +109,7 @@ export default {
   created () {
     try {
       qtiAttributeValidation.validateRubricBlockViewAttribute(this.view)
+      this.validateChildren()
     } catch (err) {
       this.isQtiValid = false
       if (err.name === 'QtiValidationException') {
@@ -114,11 +123,19 @@ export default {
   mounted () {
     if (this.isQtiValid) {
       try {
-        this.validateChildren()
+
+        if (this.isScoringRubricBlock) {
+          // Notify store of our new scoring rubric block
+          this.getStore().defineScoringRubricBlock({
+              view: this.view,
+              html: this.$refs.root.innerHTML,
+              node: this
+            })
+        }
 
         this.evaluate()
 
-        console.log('[' + this.$options.name + '][View: ' + this.view + ']')
+        console.log('[' + this.$options.name + '][TEST][View: ' + this.view + ']')
       } catch (err) {
         this.isQtiValid = false
         throw new QtiValidationException(err.message)
