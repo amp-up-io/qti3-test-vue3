@@ -135,7 +135,7 @@ export default {
 
         this.evaluate()
 
-        console.log('[' + this.$options.name + '][TEST][View: ' + this.view + ']')
+        console.log('[' + this.$options.name + '][' + this.rubricBlockContext + '][View: ' + this.view + ']')
       } catch (err) {
         this.isQtiValid = false
         throw new QtiValidationException(err.message)
