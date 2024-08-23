@@ -346,6 +346,7 @@ export default {
       }
 
       // For debugging purposes
+      this.printTestDuration()
       this.printOutcomeDeclarations()
 
       //
@@ -372,12 +373,21 @@ export default {
     },
 
     /**
-     * @description Utility method to display outcome variables
+     * @description Utility method to display outcome variables.
      */
     printOutcomeDeclarations () {
       teststore.getOutcomeDeclarations().forEach((od) => {
         console.log('[ProcessOutcomes][Outcomes][' + od.identifier + '][Value]', od.value)
       })
+    },
+
+    /**
+     * @description Utility method to display the built-in 'duration' response variable.
+     */
+    printTestDuration () {
+      const duration  = teststore.getResponseDeclaration('duration')
+      // Print this as an outcome even though it is a response variable
+      console.log('[ProcessOutcomes][Outcomes][duration][Value]', duration.value)
     }
 
   },

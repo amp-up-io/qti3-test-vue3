@@ -314,11 +314,11 @@ export const teststore = {
   },
 
   /**
-   * Snapshot the Test Timer, augment the 'duration' outcome variable,
+   * Snapshot the Test Timer, augment the 'duration' response variable,
    * then restart the Test Timer. 
    */
   updateTestDuration () {
-    const duration = this.getOutcomeDeclaration('duration')
+    const duration = this.getResponseDeclaration('duration')
     duration.value += this.testTimer.getTime()
     this.restartTestTimer()
   },
@@ -338,11 +338,11 @@ export const teststore = {
   },
 
   /**
-   * Snapshot the Test Timer, augment the 'duration' outcome variable,
+   * Snapshot the Test Timer, augment the 'duration' response variable,
    * then reset the Test Timer. 
    */
   pauseTestTimer () {
-    const duration = this.getOutcomeDeclaration('duration')
+    const duration = this.getResponseDeclaration('duration')
     duration.value += this.testTimer.getTime()
     this.testTimer.resetTimer()
   },
