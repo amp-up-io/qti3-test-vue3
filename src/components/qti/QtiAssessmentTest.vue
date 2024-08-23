@@ -360,8 +360,6 @@ export default {
 
     resetOutcomeDeclarations () {
       teststore.getOutcomeDeclarations().forEach((od) => {
-        // Do not reset the built-in 'duration' variable
-        if (od.identifier === 'duration') return
         this.resetOutcomeDeclaration(od)
       })
     },
@@ -370,14 +368,7 @@ export default {
       // If a variable was declared, it has a reset method.
       if (declaration.node !== undefined) {
         declaration.node.reset()
-        return
       }
-      // Must be a built-in variable that was never explicitly declared.
-      // Reset its value to its built-in default.
-      teststore.setOutcomeVariableValue({
-          identifier: declaration.identifier,
-          value: declaration.defaultValue
-        })
     },
 
     /**
