@@ -305,6 +305,9 @@ export default {
     endAttempt (callback) {
       console.log('[EndAttempt][Start]')
 
+      // Update test duration before processing outcomes
+      teststore.updateTestDuration()
+
       // Run Outcome Processing
       this.processOutcomes()
 

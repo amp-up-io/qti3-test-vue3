@@ -312,6 +312,16 @@ export const teststore = {
     this.testTimer.resetTimer()
   },
 
+  /**
+   * Snapshot the Test Timer, augment the 'duration' outcome variable,
+   * then reset the Test Timer. 
+   */
+  pauseTestTimer () {
+    const duration = this.getOutcomeDeclaration('duration')
+    duration.value += this.testTimer.getTime()
+    this.testTimer.resetTimer()
+  },
+
   getTestContextGuid () {
     return this.testContext.guid
   },

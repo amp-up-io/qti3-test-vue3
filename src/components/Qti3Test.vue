@@ -277,6 +277,16 @@ export default {
       context.emit('notifyQti3TestEndAttemptCompleted', testState)
     }
 
+    function startTestTimer () {
+      // This updates duration and starts the timer
+      teststore.updateTestDuration()
+    }
+
+    function pauseTestTimer () {
+      // This updates duration and pauses the timer
+      teststore.pauseTestTimer()
+    }
+
     /**
      * @description All QTI 3 Assessment Test components are loaded into the 
      * global app context here.
@@ -421,7 +431,9 @@ export default {
       setTestStateItemState,
       getAllTestStateItemStates,
       handleTestReady,
-      handleEndAttemptReady
+      handleEndAttemptReady,
+      startTestTimer,
+      pauseTestTimer
     }
 
   }, // setup
