@@ -62,6 +62,7 @@ export default {
 
   data () {
     return {
+      stylesheets: [],
       rubricBlocks: [],
       timeLimits: null,
       isQtiValid: true
@@ -94,6 +95,10 @@ export default {
       return this.rubricBlocks
     },
 
+    getStylesheets () {
+      return this.stylesheets
+    },
+
     getTestParts () {
       return teststore.getTestParts()
     },
@@ -119,7 +124,7 @@ export default {
     },
     
     isRubricBlock (tag) {
-      if (tag === 'QtiRubricBlock') return true
+      if (tag === 'qti-rubric-block') return true
       return false
     },
 
@@ -280,6 +285,8 @@ export default {
           case 'qti-time-limits':
             this.timeLimits = child.component.proxy
             break
+          case 'qti-stylesheet':
+            this.stylesheets.push(child.component.proxy)
         }
       })
     },
