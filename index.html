@@ -11,28 +11,28 @@
     window.qti3TestPlayerContext = {
       "summary": {
         "identifier":"t1-outcome-declaration-t9-outcome-processing",
-        "xml":`<qti-assessment-test xmlns=\"http://www.imsglobal.org/xsd/imsqtiasi_v3p0\" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" 
-        identifier=\"t1-outcome-declaration-t9-outcome-processing\" 
-        title=\"T1 - Outcome Declaration and T9 Outcomes Processing for Tests\" 
-        xsi:schemaLocation=\"http://www.imsglobal.org/xsd/imsqtiasi_v3p0 https://purl.imsglobal.org/spec/qti/v3p0/schema/xsd/imsqti_asiv3p0_v1p0.xsd\">\n    
-        <qti-outcome-declaration base-type=\"float\" cardinality=\"single\" identifier=\"SCORE_TOTAL\">
-          <qti-default-value>\n            
-            <qti-value>0</qti-value>\n        
-          </qti-default-value>\n    
-        </qti-outcome-declaration>\n    
-        <qti-test-part identifier=\"testPart-1\" navigation-mode=\"linear\" submission-mode=\"individual\">\n
-          <qti-assessment-section identifier=\"assessmentSection-1\" keep-together=\"true\" title=\"Section 1\" visible=\"true\">\n            
-            <qti-assessment-item-ref href=\"items/item-1.xml\" identifier=\"t1-outcome-declaration-item-1\"></qti-assessment-item-ref>\n            
-            <qti-assessment-item-ref href=\"items/item-2.xml\" identifier=\"t1-outcome-declaration-item-2\"></qti-assessment-item-ref>\n            
-            <qti-assessment-item-ref href=\"items/item-3.xml\" identifier=\"t1-outcome-declaration-item-3\"></qti-assessment-item-ref>\n        
-          </qti-assessment-section>\n   
-        </qti-test-part>\n    
-        <qti-outcome-processing>\n        
-          <qti-set-outcome-value identifier=\"SCORE_TOTAL\">\n            
-            <qti-sum>\n                
-              <qti-test-variables section-identifier=\"assessmentSection-1\" variable-identifier=\"SCORE\"></qti-test-variables>\n                
-              <qti-variable identifier=\"SCORE_TOTAL\"></qti-variable>\n            
-            </qti-sum>\n        
+        "xml":`<qti-assessment-test xmlns="http://www.imsglobal.org/xsd/imsqtiasi_v3p0" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance" 
+        identifier="t1-outcome-declaration-t9-outcome-processing" 
+        title="T1 - Outcome Declaration and T9 Outcomes Processing for Tests" 
+        xsi:schemaLocation="http://www.imsglobal.org/xsd/imsqtiasi_v3p0 https://purl.imsglobal.org/spec/qti/v3p0/schema/xsd/imsqti_asiv3p0_v1p0.xsd">
+        <qti-outcome-declaration base-type="float" cardinality="single" identifier="SCORE_TOTAL">
+          <qti-default-value>
+            <qti-value>0</qti-value>
+          </qti-default-value>
+        </qti-outcome-declaration>
+        <qti-test-part identifier="testPart-1" navigation-mode="linear" submission-mode="individual">
+          <qti-assessment-section identifier="assessmentSection-1" keep-together="true" title="Section 1" visible="true">     
+            <qti-assessment-item-ref href="items/item-1.xml" identifier="t1-outcome-declaration-item-1"/>
+            <qti-assessment-item-ref href="items/item-2.xml" identifier="t1-outcome-declaration-item-2"/>
+            <qti-assessment-item-ref href="items/item-3.xml" identifier="t1-outcome-declaration-item-3"/>
+          </qti-assessment-section>
+        </qti-test-part>
+        <qti-outcome-processing>
+          <qti-set-outcome-value identifier="SCORE_TOTAL">
+            <qti-sum>
+              <qti-test-variables section-identifier="assessmentSection-1" variable-identifier="SCORE"/>
+              <qti-variable identifier="SCORE_TOTAL"/>
+            </qti-sum>
           </qti-set-outcome-value>
         </qti-outcome-processing>
       </qti-assessment-test>`
