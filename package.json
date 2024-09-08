@@ -1,6 +1,6 @@
 {
   "name": "qti3-test-vue3",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "QTI 3 Test Component implemented with Vue 3",
   "author": {
     "name": "Paul Grudnitski",
