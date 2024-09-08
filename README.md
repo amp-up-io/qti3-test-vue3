@@ -10,11 +10,11 @@
 
 
 
-The QTI 3 Test Component is a Vue 3 JavaScript component that aims to provide an information model, and an execution model (for Outcome Processing), that encapsulates the best practices and behaviors of the 1EdTech QTI 3 Assessment **Test** specification.
+The QTI 3 Test Component is a Vue 3 JavaScript component that aims to provide an information model, and a runtime execution model (for Outcome Processing), that encapsulates the best practices and behaviors of the 1EdTech QTI 3 Assessment **Test** specification.
 
-A client application can inject QTI 3 Test XML into QTI 3 Test Component, which parses the QTI 3 Assessment Test XML and provides an information model with various methods and properties for inspection back to the client.  QTI 3 Test Component also has methods for injecting item states which can then be used when running Outcome Processing (such as when submission mode is "individual" or "simultaneous").
+A client application can inject QTI 3 Test XML into QTI 3 Test Component, which parses the QTI 3 Assessment Test XML, thus providing an information model with various methods and properties for inspection back to the client.  QTI 3 Test Component also has methods for injecting item states which can then be used when running Outcome Processing (such as when submission mode is "individual" or "simultaneous").
 
-See the 1EdTech QTI 3 Information Model documentation for more information about the QTI 3 Assessment Test lifecycle.
+See the 1EdTech QTI 3 Information Model documentation for more information about the QTI 3 Assessment Test information model and runtime lifecycle.
 
 [IMS Question and Test Interoperability (QTI): Assessment, Section and Item Information Model Version 3.0](https://www.imsglobal.org/sites/default/files/spec/qti/v3/info/index.html)
 
@@ -58,3 +58,332 @@ npm run build
 ```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
+
+## Usage
+
+### 1. Install QTI 3 Test Component into your project
+
+```sh
+cd <Project folder where your package.json is located> 
+npm install qti3-test-vue3
+```
+
+### 2. Import and Use QTI 3 Test Component
+
+```js
+import { createApp } from 'vue'
+import App from './App.vue'
+import Qti3Test from 'qti3-test-vue3'
+
+const app = createApp(App)
+
+app
+  .use(Qti3Test)
+  .mount('#app')
+```
+
+### 3. Load the QTI 3 Test Component into your Page or Template
+
+```html
+<Qti3Test
+  ref="qti3TestPlayer"
+  @notifyQti3TestPlayerReady="handleTestPlayerReady"
+  @notifyQti3TestReady="handleTestReady"
+  @notifyQti3TestEndAttemptCompleted="handleTestEndAttemptCompleted"
+/>
+```
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+
+### 4. Listen for the QTI 3 Test Component's 'notifyQti3TestPlayerReady' event
+
+This event signifies that the QTI 3 Test Component is loaded and ready for action.  The following snippet is a sample handler for the `notifyQti3TestPlayerReady` event.  QTI 3 Test Component hands itself as an argument to the `notifyQti3TestPlayerReady` event, thus simplifying further QTI 3 Test Component API calls.
+
+```js
+/**
+ * @description Event handler for the QTI3TestPlayer component's 'notifyQti3TestPlayerReady'
+ * event.  This event is fired upon mounting of the Qti3TestPlayer component.
+ *
+ * The Qti3TestPlayer is now ready for XML loading.
+ * @param {Component} qti3TestPlayer - the Qti3 Test Component itself
+ */
+handleTestPlayerReady (qti3TestPlayer) {
+  // Qti3 Test Component is ready!  Keep a handle on it.
+  this.qti3TestPlayer = qti3TestPlayer
+},
+```
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+
+### 5. Load QTI 3 Assessment Test XML into QTI 3 Test Component
+
+Once QTI 3 Test Component is loaded and ready (see #4 above), QTI 3 Assessment Test XML can be loaded directly into QTI 3 Test Component via the Component's `loadTestFromXML` method which takes two arguments `xml {String}` and `configuration {Object}`.  
+
+```js
+// Load QTI 3 Assessment Test XML with a Configuration.  See #5a below for more 
+// information about Configurations. Use the 'this.qti3TestPlayer' reference
+// saved in the notifyQti3TestPlayerReady event handler.
+this.qti3TestPlayer.loadTestFromXml(xml, configuration)
+```
+
+
+#### 5a) About a Configuration
+
+The `configuration` object is used to specify runtime context to QTI 3 Test Component during the test session loaded in `loadTestFromXml`.  A configuration object has the following structure:
+
+```js
+configuration: {
+  guid: <{String} identifier used to track a test attempt>,
+  pnp: <{Object} used to define Personal Needs and Preferences>,
+}
+```
+
+#### 5b) Constructing a Configuration
+
+The following snippet is an example of how an application can construct a `configuration`.
+
+```js
+// Intialize
+const configuration = {}
+
+// Stamp an test's tracking guid (if any) onto the configuration
+configuration.guid = testAttemptTrackingGuid
+
+// QTI 3 Test Component includes a helper class called 'PnpFactory' which can be used
+// to build a Personal Needs and Preferences definition.
+// The Default pnp object in the PnpFactory is:
+const pnp = {
+  textAppearance: {
+    colorStyle: 'qti3-player-color-default'
+  },
+  // Glossary is a universal support turned on (true) by default
+  glossaryOnScreen: true,
+  // Keyword translation is off ('') by default
+  keywordTranslationLanguage: '',
+  // Custom SBAC Illustrated Glossary is off (false) by default
+  extSbacGlossaryIllustration: false,
+  layoutSingleColumn: false // unsupported
+}
+
+// Set the configuration's 'pnp' property
+configuration.pnp = pnp
+ ```
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+
+### 6. Listen for the QTI 3 Test Component's 'notifyQti3TestReady' Event
+
+QTI 3 Test Component triggers a `notifyQti3TestReady` event upon completion of the Component's `loadTestFromXML` method.  The following snippet is a sample handler for the `notifyQti3TestReady` event.
+
+```js
+/**
+ * @description Event handler for the QTI3 Test Component's 'notifyQti3TestReady'
+ * event.  This event is fired upon completion of the qti-assessment-test
+ * component's loading of XML.
+ * The inner qti-assessment-test component is passed in the event.
+ * @param {Component} test - the qti-assessment-test component itself
+ */
+handleTestReady (test) {
+  // The 'test' argument is the qti-assessment-test component
+  // with all exposed properties and methods.
+  this.test = test
+}
+```
+
+The same qti-assessment-test component can be retrieved via QTI 3 Test Component's 'getTest()' method: 
+
+```js
+/**
+ * @description Generate some information about a qti-assessment-test that was
+ * loaded from QTI 3 Assessment Test XML.
+ * @return {Object} Test information
+ */
+function getTestInfo () {
+  // Get a handle on the inner qti-assessment-test component
+  const test = this.qti3TestPlayer.getTest()
+
+  return {
+    title: test.getTitle().length === 0 ? '<No Test Title>' : test.getTitle(),
+    identifier: test.getIdentifier(),
+    parts: test.getTestParts(), // Array of qti-test-parts
+    timeLimits: test.getTimeLimits(), // Test qti-time-limits element or null
+    rubricBlocks: test.getRubricBlocks() // Array of Test qti-rubric-blocks
+  }
+}
+```
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+
+### 7. Inspect the QTI 3 Assessment Test Information Model
+
+We can visualize any QTI 3 Assessment Test tree of nodes, where the Test encapsulates [1..*] of
+Test Parts.  Each Test Part encapsulates [1..*] Sections.  Each Section encapsulates [1..*] of either 
+Sub-Sections (**best practice limit** of 1 level depth of Sub-Sections) or Item References.
+
+The following is some sample code which navigates and prints a test's tree structure.
+
+```js
+const test = this.qti3TestPlayer.getTest()
+
+// Get the Test's Parts
+const parts = test.getTestParts()
+parts.forEach((part) => {
+
+  // Print qti-test-part properties
+  console.log(
+    '[QtiTestPart]', 
+    {
+      title: part.getTitle().length == 0 ? '<No Test Part Title>' : part.getTitle(),
+      identifier: part.getIdentifier(),
+      // Part navigation mode
+      navigationMode: part.getNavigationMode(),
+      // Part submission mode
+      submissionMode: part.getSubmissionMode(),
+      // Array of qti-assessment-sections
+      sections: part.getSections(),
+      // Part qti-item-session-control element or null
+      sessionControl: part.getItemSessionControl(),
+      // Part qti-time-limits element or null
+      timeLimits: part.getTimeLimits(),
+      // Array of Part qti-rubric-blocks
+      rubricBlocks: part.getRubricBlocks()
+    }
+  )
+
+  // Get the Part's Sections
+  const sections = part.getSections()
+  sections.forEach((section) => {
+
+    // Print qti-assessment-section properties
+    console.log(
+      '[QtiAssessmentSection]', 
+      {
+        title: section.getTitle().length == 0 ? '<No Section Title>' : section.getTitle(),
+        identifier: section.getIdentifier(),
+        fixed: section.getFixed(),
+        visible: section.getVisible(),
+        required: section.getRequired(),
+        keepTogether: section.getKeepTogether(),
+        // Array of RESOLVED (i.e., ordered and selected) item identifiers
+        sectionItemIdentifiers: section.getSectionItemIdentifiers(),
+        // Map (item identifier is map key) of qti-assessment-item-ref's
+        sectionItemsMap: section.getSectionItemsMap(),
+        // Section qti-item-session-control element or null
+        sessionControl: section.getItemSessionControl(),
+        // Section qti-selection element or null
+        selection: section.getSelection(),
+        // Section qti-ordering element or null
+        ordering: section.getOrdering(),
+        // Section qti-time-limits element or null
+        timeLimits: section.getTimeLimits(),
+        // Array of section qti-rubric-blocks
+        rubricBlocks: section.getRubricBlocks()
+      }
+    )
+
+    // Print all of a Section's RESOLVED Item Ref's - in the proper order
+    const sectionItemIdentifiers = section.getSectionItemIdentifiers()
+    sectionItemIdentifiers.forEach((itemIdentifier) => {
+
+      // Pull the full qti-assessment-item-ref component from the sectionItemsMap
+      const itemRef = section.getSectionItemsMap().get(itemIdentifier)
+      // Print qti-assessment-item-ref properties
+      console.log(
+        '[QtiAssessmentItemRef]', 
+        {
+          identifier: itemRef.getIdentifier(),
+          fixed: itemRef.getFixed(),
+          required: itemRef.getRequired(),
+          href: itemRef.getHref()
+          // Item Ref 'category' attribute or null
+          category: itemRef.getCategory(),
+          // Item Ref qti-item-session-control element or null
+          sessionControl: itemRef.getItemSessionControl(),
+          // Item Ref qti-time-limits element or null
+          timeLimits: itemRef.getTimeLimits(),
+        }
+      )
+
+    }) // end sectionItemIdentifiers.forEach
+
+  }) // end section.forEach
+
+}) // end part.forEach
+```
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+
+## Roadmap
+
+The QTI3 Test Component development roadmap includes all features and capabilities included in the QTI 3 Assessment **Test** specification.
+
+- [x] Support for Test, Part, multi-Part, Section, Item-Ref elements
+- [x] Support for all Outcome Processing Rules
+- [x] Support for all Outcome Processing Expressions
+- [x] Support for Section Selection and Ordering elements
+- [x] Support for Item Session Control elements at the Part, Section, Item-Ref levels
+- [x] Support for Time Limits elements at the Test, Part, Section levels
+- [x] Support for Rubric Block elements at the Test, Part, Section levels
+- [x] Support for Stylesheet elements
+- [ ] Test Feedback
+- [ ] Item-Ref Pre-Condition Rules
+- [ ] Item-Ref Branch Rules
+- [ ] Item-Ref Variable Mapping Support
+- [ ] Item-Ref Weight Support
+- [ ] Item-Ref Template Default Support
+- [ ] Catalog Info Support in Test Feedback and Test Rubric Blocks
+- [ ] Printed Variable Support in Test Feedback and Test Rubric Blocks
+- [ ] Restore Test State
+- [x] Set Item State API Examples
+
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+
+
+<!-- LICENSE -->
+## License
+
+Distributed under the MIT License. See `LICENSE` for more information.
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+
+
+## Built With
+
+The QTI3 Test Component is built with the Vue 3.4 (v3.4.34) framework and Vite.
+
+* [Vue.js](https://vuejs.org/)
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+
+
+<!-- CONTACT -->
+## Contact
+
+Paul Grudnitski - paul.grudnitski@amp-up.io
+
+Project Link: [https://github.com/amp-up-io/qti3-test-vue3](https://github.com/amp-up-io/qti3-test-vue3)
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+
+
+<!-- ACKNOWLEDGMENTS -->
+## Acknowledgments
+
+This component would not be possible were it not for a fortuitous decision by the aQTI Task Force (the original name of the QTI 3 Working Group) - meeting at CITO headquarters in Arnhem, NE, January 2015 - to make the aQTI / QTI 3 specification "web component friendly".
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+
+[license-shield]: https://img.shields.io/github/license/amp-up-io/qti3-test-vue3?label=License&style=for-the-badge
+[license-url]: https://github.com/amp-up-io/qti3-test-vue3/blob/main/LICENSE
+
