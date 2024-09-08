@@ -142,15 +142,6 @@ export default {
       // Use the player's getTest() method to get a handle on the
       // QTI 3 assessmentTest component and all exposed methods.
       this.test = this.qti3TestPlayer.getTest()
-
-
-      //this.testIdentifier = assessmentTest.getIdentifier()
-      //this.testTitle = 
-      //    assessmentTest.getTitle().length == 0 
-      //      ? '<No Test Title>' 
-      //      : assessmentTest.getTitle()
-      //this.testParts = assessmentTest.getTestParts()
-
     },
 
     handleInitiateTestEndAttempt () {
