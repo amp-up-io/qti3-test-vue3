@@ -330,6 +330,15 @@ See section **9) Loading Part > Section > Item State** below for more informatio
 
 The `endAttempt` method may take a considerable amount of time to complete.  QTI 3 Test Component triggers the `notifyQti3TestEndAttemptCompleted` event upon completion of an `endAttempt` method call.
 
+Wire a handler to the `notifyQti3TestEndAttemptCompleted` event.
+
+```html
+<Qti3Test
+  ref="qti3TestPlayer"
+  @notifyQti3TestEndAttemptCompleted="handleTestEndAttemptCompleted"
+/>
+```
+
 ```js
 // Call the endAttempt method, passing an optional string/target action that will be
 // echoed back in the notifyQti3TestEndAttemptCompleted event payload.  The string/target action
@@ -345,9 +354,11 @@ this.qti3TestPlayer.endAttempt('navigateNextItem')
  * @param {Object} data - the test's state, including outcomes from outcome processing
  */
 handleTestEndAttemptCompleted (data) {
-  // 'data' contains the test state (in the 'state' property), including outcome
-  // variable values and context variable values.
-  console.log('[Outcome Processing Completed], testState:', data.state)
+  // 'data' contains the test state in a 'state' property, including outcome variable values.
+  // 'data' also has a 'target' property that echos the value (if any) of the target string
+  // parameter passed into the originaging endAttempt call.
+  // ... do something ...
+  console.log('[EndAttempt Completed], Test State:', data.state)
 }
 ```
 
@@ -369,6 +380,8 @@ Prior to calling QTI 3 Test Component's `endAttempt` method, a test controller s
  */
 setTestStateItemState(partIdentifier, sectionIdentifier, itemIdentifier, itemState)
 ```
+
+The following is some sample script that loads two Item States into QTI 3 Test Component.  Then Outcome Processing is executed via QTI 3 Test Component's `endAttempt` method.
 
 ```js
 /**
@@ -516,11 +529,50 @@ const item3State = {
 // Load testPart-1 > assessmentSection-1 >  t1-outcome-declaration-item-3 state
 setTestState('testPart-1', item3State)
 
-// Execute Outcome Processing
+// Execute Outcome Processing!  The results/outcomes will be passed
+// in the notifyQti3TestEndAttemptCompleted handler.
 this.qti3TestPlayer.endAttempt()
 ```
 
 <p align="right">(<a href="#top">back to top</a>)</p>
+
+
+### 10. Inspect Outcomes
+
+Outcome variable values are passed as a parameter in the `notifyQti3TestEndAttemptCompleted` event.  To inspect
+outcome variable values, wire a handler to the `notifyQti3TestEndAttemptCompleted` event.  Then examine the
+`state` property of the data passed with the `notifyQti3TestEndAttemptCompleted` event.
+
+```html
+<Qti3Test
+  ref="qti3TestPlayer"
+  @notifyQti3TestEndAttemptCompleted="handleTestEndAttemptCompleted"
+/>
+```
+
+```js
+/**
+ * @description Example event handler for the QTI 3 Test Component's 'notifyQti3TestEndAttemptCompleted'
+ * event.  This event is fired upon completion of the endAttempt method.
+ * @param {Object} data - the test's state, including outcomes from outcome processing
+ */
+handleTestEndAttemptCompleted (data) {
+  // 'data' contains the test state in a 'state' property, including outcome variable values.
+  // 'data' also has a 'target' property that echos the value (if any) of the target string
+  // parameter passed into the originaging endAttempt call.
+  // ... do something ...
+  console.log('[EndAttempt Completed], Test State:', data.state)
+  const testState = data.state
+  const target = data.target
+  // Echo all Outcome variables in the Test State
+  testState.outcomeVariables.forEach((outcomeVariable) => {
+    console.log(`[Outcome][${outcomeVariable.identifier}][Value=${outcomeVariable.value}]`)
+  })
+}
+```
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
 
 
 ## Roadmap
