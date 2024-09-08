@@ -318,6 +318,211 @@ parts.forEach((part) => {
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
+### 8. Running Outcome Processing
+
+After Test XML is loaded, and depending on a Test Part's `submission-mode` attribute, a test controller may choose to execute the Test's qti-outcome-processing code (if any).  This is accomplished by invoking QTI 3 Test Component's `endAttempt` method.  For example, when a Test Part's `submission-mode="individual"`, a test controller must call `endAttempt`.  When a Test Part's `submission-mode="simultaneous"`, a test controller must call `endAttempt` only upon completion of the Test Part.
+
+#### 8a) Calling endAttempt and handling the notifyQti3TestEndAttemptCompleted event
+
+Calling `endAttempt` method _executes outcome processing_ with the currently-loaded Part > Section > Item States loaded into QTI 3 Test Component, and produces the state of all test variables.  QTI 3 Test Component supports the _full QTI 3 outcome processing_ expression vocabulary.
+
+See section **9) Loading Part > Section > Item State** below for more information.
+
+The `endAttempt` method may take a considerable amount of time to complete.  QTI 3 Test Component triggers the `notifyQti3TestEndAttemptCompleted` event upon completion of an `endAttempt` method call.
+
+```js
+// Call the endAttempt method, passing an optional string/target action that will be
+// echoed back in the notifyQti3TestEndAttemptCompleted event payload.  The string/target action
+// can be useful to a test controller as a way to track the context for the 
+// notifyQti3TestEndAttemptCompleted callback.
+this.qti3TestPlayer.endAttempt('navigateNextItem')
+```
+
+```js
+/**
+ * @description Example event handler for the QTI3 Test Component's 'notifyQti3TestEndAttemptCompleted'
+ * event.  This event is fired upon completion of the endAttempt method.
+ * @param {Object} data - the test's state, including outcomes from outcome processing
+ */
+handleTestEndAttemptCompleted (data) {
+  // 'data' contains the test state (in the 'state' property), including outcome
+  // variable values and context variable values.
+  console.log('[Outcome Processing Completed], testState:', data.state)
+}
+```
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+
+### 9. Loading Part > Section > Item State
+
+Prior to calling QTI 3 Test Component's `endAttempt` method, a test controller should load or update Item State.  This is accomplished via QTI 3 Test Component's `setTestStateItemState` method.
+
+```js
+/**
+ * @description Method to inject an item state by partIdentifier, section identifier, and item identifier.
+ * @param {String} partIdentifier - the part identifier
+ * @param {String} sectionIdentifier - the section identifier
+ * @param {String} itemIdentifier - the item identifier
+ * @param {Object} itemState - a state object built
+ *                             from an ItemStateFactory
+ */
+setTestStateItemState(partIdentifier, sectionIdentifier, itemIdentifier, itemState)
+```
+
+```js
+/**
+ * @description Utility function to load a Part > Section > Item State into QTI 3 Test component.
+ */
+function setTestState (testPartIdentifier, state) {
+  // Load the state into the TestPlayer
+  const identifiers = state.guid.split('~~')
+  const sectionIdentifier = identifiers[0]
+  const itemIdentifier = identifiers[1]
+  this.qti3TestPlayer.setTestStateItemState(testPartIdentifier,sectionIdentifier,itemIdentifier,state)
+}
+
+// Construct item 1 state
+const item1State = {
+  "identifier": "t1-outcome-declaration-item-1",
+  "guid": "assessmentSection-1~~t1-outcome-declaration-item-1",
+  "contextVariables": [
+    {
+      "identifier": "QTI_CONTEXT",
+      "cardinality": "record",
+      "baseType": null,
+      "value": {}
+    }
+  ],
+  "responseVariables": [
+    {
+      "identifier": "numAttempts",
+      "cardinality": "single",
+      "baseType": "integer",
+      "value": 1,
+      "state": null
+    },
+    {
+      "identifier": "duration",
+      "cardinality": "single",
+      "baseType": "time",
+      "value": 12,
+      "state": null
+    },
+    {
+      "identifier": "RESPONSE",
+      "cardinality": "single",
+      "baseType": "identifier",
+      "value": "correct",
+      "state": {
+          "order": [
+              "correct",
+              "incorrect"
+          ]
+      },
+      "correctResponse": "correct"
+    }
+  ],
+  "outcomeVariables": [
+    {
+      "identifier": "SCORE",
+      "cardinality": "single",
+      "baseType": "float",
+      "value": 1
+    },
+    {
+      "identifier": "MAXSCORE",
+      "cardinality": "single",
+      "baseType": "float",
+      "value": 1
+    },
+    {
+      "identifier": "completionStatus",
+      "cardinality": "single",
+      "value": "not_attempted"
+    }
+  ],
+  "templateVariables": [],
+  "validationMessages": []
+}
+
+// Load testPart-1 > assessmentSection-1 >  t1-outcome-declaration-item-1 state
+setTestState('testPart-1', item1State)
+
+// Construct item 3 state
+const item3State = {
+  "identifier": "t1-outcome-declaration-item-3",
+  "guid": "assessmentSection-1~~t1-outcome-declaration-item-3",
+  "contextVariables": [
+    {
+      "identifier": "QTI_CONTEXT",
+      "cardinality": "record",
+      "baseType": null,
+      "value": {}
+    }
+  ],
+  "responseVariables": [
+    {
+      "identifier": "numAttempts",
+      "cardinality": "single",
+      "baseType": "integer",
+      "value": 1,
+      "state": null
+    },
+    {
+      "identifier": "duration",
+      "cardinality": "single",
+      "baseType": "time",
+      "value": 5,
+      "state": null
+    },
+    {
+      "identifier": "RESPONSE",
+      "cardinality": "single",
+      "baseType": "identifier",
+      "value": "correct",
+      "state": {
+          "order": [
+              "correct",
+              "incorrect"
+          ]
+      },
+      "correctResponse": "correct"
+    }
+  ],
+  "outcomeVariables": [
+    {
+      "identifier": "SCORE",
+      "cardinality": "single",
+      "baseType": "float",
+      "value": 1
+    },
+    {
+      "identifier": "MAXSCORE",
+      "cardinality": "single",
+      "baseType": "float",
+      "value": 1
+    },
+    {
+      "identifier": "completionStatus",
+      "cardinality": "single",
+      "value": "not_attempted"
+    }
+  ],
+  "templateVariables": [],
+  "validationMessages": []
+}
+
+// Load testPart-1 > assessmentSection-1 >  t1-outcome-declaration-item-3 state
+setTestState('testPart-1', item3State)
+
+// Execute Outcome Processing
+this.qti3TestPlayer.endAttempt()
+```
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
+
 ## Roadmap
 
 The QTI3 Test Component development roadmap includes all features and capabilities included in the QTI 3 Assessment **Test** specification.
