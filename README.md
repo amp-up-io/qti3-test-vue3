@@ -642,5 +642,5 @@ This component would not be possible were it not for a fortuitous decision by th
 
 
 [license-shield]: https://img.shields.io/github/license/amp-up-io/qti3-test-vue3?label=License&style=for-the-badge
-[license-url]: https://github.com/amp-up-io/qti3-test-vue3/blob/main/LICENSE
+[license-url]: https://github.com/amp-up-io/qti3-test-vue3/blob/master/LICENSE
 
