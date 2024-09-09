@@ -2,7 +2,7 @@
 
 <div id="top"></div>
 
-[![MIT License][license-shield]][license-url]
+![GitHub License](https://img.shields.io/github/license/amp-up-io/qti3-test-vue3?style=for-the-badge&label=License)
 
 <a href="https://site.imsglobal.org/certifications/amp-upio/amp-upio-qti-3-test-player" target="_blank">
 <img align="right" src="https://site.imsglobal.org/sites/default/files/media/images/logo_ims/1edtech_trusted-apps-certified.svg" width="187" height="200" border="1" alt="1EdTech Certified">
@@ -606,7 +606,7 @@ The QTI3 Test Component development roadmap includes all features and capabiliti
 <!-- LICENSE -->
 ## License
 
-Distributed under the MIT License. See `LICENSE` for more information.
+Distributed under the MIT License. See [LICENSE](https://github.com/amp-up-io/qti3-test-vue3/blob/master/LICENSE) for more information.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
