@@ -63,6 +63,8 @@ import QtiSetDefaultValue from '@/components/qti/processing/rules/QtiSetDefaultV
 
 // Expressions
 import QtiBaseValue from '@/components/qti/processing/expressions/QtiBaseValue.vue'
+import QtiContains from '@/components/qti/processing/expressions/QtiContains.vue'
+import QtiContainerSize from '@/components/qti/processing/expressions/QtiContainerSize.vue'
 import QtiCorrect from '@/components/qti/processing/expressions/QtiCorrect.vue'
 import QtiDefault from '@/components/qti/processing/expressions/QtiDefault.vue'
 import QtiVariable from '@/components/qti/processing/expressions/QtiVariable.vue'
@@ -82,6 +84,7 @@ import QtiEqualRounded from '@/components/qti/processing/expressions/QtiEqualRou
 import QtiFieldValue from '@/components/qti/processing/expressions/QtiFieldValue.vue'
 import QtiRandomFloat from '@/components/qti/processing/expressions/QtiRandomFloat.vue'
 import QtiRandomInteger from '@/components/qti/processing/expressions/QtiRandomInteger.vue'
+import QtiInside from '@/components/qti/processing/expressions/QtiInside.vue'
 import QtiIntegerDivide from '@/components/qti/processing/expressions/QtiIntegerDivide.vue'
 import QtiIntegerModulus from '@/components/qti/processing/expressions/QtiIntegerModulus.vue'
 import QtiIntegerToFloat from '@/components/qti/processing/expressions/QtiIntegerToFloat.vue'
@@ -367,6 +370,8 @@ export default {
 
       app
         .component('qti-base-value', QtiBaseValue)
+        .component('qti-container-size', QtiContainerSize)
+        .component('qti-contains', QtiContains)
         .component('qti-correct', QtiCorrect)
         .component('qti-default', QtiDefault)
         .component('qti-variable', QtiVariable)
@@ -386,6 +391,7 @@ export default {
         .component('qti-field-value', QtiFieldValue)
         .component('qti-random-float', QtiRandomFloat)
         .component('qti-random-integer', QtiRandomInteger)
+        .component('qti-inside', QtiInside)
         .component('qti-integer-divide', QtiIntegerDivide)
         .component('qti-integer-modulus', QtiIntegerModulus)
         .component('qti-integer-to-float', QtiIntegerToFloat)
