@@ -1,6 +1,6 @@
 {
   "name": "qti3-test-vue3",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "description": "QTI 3 Test Component implemented with Vue 3",
   "author": {
     "name": "Paul Grudnitski",
@@ -42,9 +42,9 @@
     "vue": "^3.4.34"
   },
   "devDependencies": {
-    "@vitejs/plugin-vue": "^5.0.5",
+    "@vitejs/plugin-vue": "^5.2.3",
     "eslint": "^8.57.0",
     "eslint-plugin-vue": "^9.23.0",
-    "vite": "^5.3.1"
+    "vite": "^6.2.6"
   }
 }
